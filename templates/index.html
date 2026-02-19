@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Warrior Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>⚔️ WARRIOR DASHBOARD</h1>
+            <p class="tagline">"This isn't a schedule. This is your character arc."</p>
+        </header>
+
+        <!-- Character Overview -->
+        <section class="character-overview">
+            <div class="stat-card main-stats">
+                <h2>📊 CHARACTER STATS</h2>
+                <div class="character-info">
+                    <div class="info-item">
+                        <span class="label">Level:</span>
+                        <span class="value" id="char-level">1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Total Points:</span>
+                        <span class="value" id="total-points">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">This Week:</span>
+                        <span class="value" id="week-points">0</span>
+                        <span class="value"> / <span id="week-target">600</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 Core Stats -->
+            <div class="stats-grid">
+                <div class="stat-card strength">
+                    <div class="stat-header">
+                        <span class="stat-icon">⚔️</span>
+                        <h3>STRENGTH</h3>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-level">Lv. <span id="strength-level">1</span></span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="strength-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="stat-xp"><span id="strength-xp">0</span> / <span id="strength-next">100</span> XP</span>
+                    </div>
+                </div>
+
+                <div class="stat-card intellect">
+                    <div class="stat-header">
+                        <span class="stat-icon">🧠</span>
+                        <h3>INTELLECT</h3>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-level">Lv. <span id="intellect-level">1</span></span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="intellect-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="stat-xp"><span id="intellect-xp">0</span> / <span id="intellect-next">100</span> XP</span>
+                    </div>
+                </div>
+
+                <div class="stat-card discipline">
+                    <div class="stat-header">
+                        <span class="stat-icon">🛡️</span>
+                        <h3>DISCIPLINE</h3>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-level">Lv. <span id="discipline-level">1</span></span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="discipline-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="stat-xp"><span id="discipline-xp">0</span> / <span id="discipline-next">100</span> XP</span>
+                    </div>
+                </div>
+
+                <div class="stat-card energy">
+                    <div class="stat-header">
+                        <span class="stat-icon">⚡</span>
+                        <h3>ENERGY</h3>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-level">Lv. <span id="energy-level">1</span></span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="energy-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="stat-xp"><span id="energy-xp">0</span> / <span id="energy-next">100</span> XP</span>
+                    </div>
+                </div>
+
+                <div class="stat-card influence">
+                    <div class="stat-header">
+                        <span class="stat-icon">👑</span>
+                        <h3>INFLUENCE</h3>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-level">Lv. <span id="influence-level">1</span></span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="influence-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="stat-xp"><span id="influence-xp">0</span> / <span id="influence-next">100</span> XP</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Streaks -->
+        <section class="streaks-section">
+            <h2>🔥 ACTIVE STREAKS</h2>
+            <div class="streaks-grid" id="streaks-container">
+                <!-- Streaks will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Today's Quest -->
+        <section class="quest-section">
+            <h2>🎯 TODAY'S QUEST</h2>
+            <button class="btn btn-primary" id="open-quest-modal">📝 Log Today's Activities</button>
+            
+            <div class="today-summary" id="today-summary" style="display: none;">
+                <h3>Today's Progress</h3>
+                <div class="summary-stats">
+                    <div class="summary-item">
+                        <span class="label">Points Earned:</span>
+                        <span class="value" id="today-points">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Status:</span>
+                        <span class="value" id="today-status">Not Logged</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Daily Challenge -->
+        <section class="daily-challenge-section">
+            <h2>🎲 DAILY CHALLENGE</h2>
+            <div class="challenge-card" id="challenge-card">
+                <!-- Challenge will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Nemesis Mode -->
+        <section class="nemesis-section">
+            <h2>💀 NEMESIS MODE</h2>
+            <div class="nemesis-container" id="nemesis-container">
+                <!-- Nemesis status will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Ghost Data / Leaderboard -->
+        <section class="ghost-section">
+            <h2>👻 GHOST DATA</h2>
+            <div class="ghost-container" id="ghost-container">
+                <!-- Ghost comparison data will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Analytics Dashboard -->
+        <section class="analytics-section">
+            <h2>📊 ANALYTICS</h2>
+            <div class="analytics-container" id="analytics-container">
+                <!-- Analytics will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Achievements -->
+        <section class="achievements-section">
+            <h2>🏆 ACHIEVEMENTS</h2>
+            <div class="achievements-grid" id="achievements-container">
+                <!-- Achievements will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Personal Records (PR Tracker) -->
+        <section class="pr-tracker-section">
+            <h2>💪 PERSONAL RECORDS</h2>
+            <button class="btn btn-primary" id="open-pr-modal">📊 Log New PR</button>
+            
+            <div class="pr-grid" id="pr-container">
+                <!-- PRs will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Notes & Planning -->
+        <section class="notes-section">
+            <h2>📝 NOTES & PLANNING</h2>
+            <div class="notes-actions">
+                <button class="btn btn-note" id="open-notes-modal">✍️ Add Note/Plan</button>
+            </div>
+            
+            <div class="notes-container">
+                <!-- Active Plans -->
+                <div class="plans-section">
+                    <h3>🎯 Active Plans</h3>
+                    <div id="plans-list">
+                        <!-- Plans will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Recent Notes -->
+                <div class="recent-notes-section">
+                    <h3>📔 Recent Notes</h3>
+                    <div id="notes-list">
+                        <!-- Notes will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Budget Tracker -->
+        <section class="budget-section">
+            <h2>💰 BUDGET TRACKER</h2>
+            <div class="budget-actions">
+                <button class="btn btn-primary" id="open-budget-modal">💵 Add Transaction</button>
+            </div>
+            
+            <div class="budget-overview" id="budget-overview">
+                <!-- Budget overview will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Workout Sessions -->
+        <section class="workout-section">
+            <h2>💪 WORKOUT SESSIONS</h2>
+            <div class="workout-actions">
+                <button class="btn btn-primary" id="open-workout-modal">📋 Log Workout</button>
+            </div>
+            
+            <div class="workout-container" id="workout-container">
+                <!-- Workouts will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Skill Tree -->
+        <section class="skill-tree-section">
+            <h2>🌳 SKILL TREE</h2>
+            <div class="available-points">
+                Available Points: <span id="available-points">0</span>
+            </div>
+            <div class="skill-tree-grid" id="skill-tree-container">
+                <!-- Skills will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Quest Modal -->
+    <div id="quest-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Log Today's Activities</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="quest-form">
+                    <!-- Tier 1: Foundation -->
+                    <div class="tier-section tier1">
+                        <h3>⚔️ TIER 1: FOUNDATION (Complete ALL)</h3>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="tier1_sleep">
+                            <span>7+ hours sleep (8p)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="tier1_no_porn">
+                            <span>No porn (clean day)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="tier1_focused">
+                            <span>One focused session (25+ min)</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="tier1_move">
+                            <span>Move body (15+ min)</span>
+                        </label>
+                    </div>
+
+                    <!-- Tier 2: Power-Ups -->
+                    <div class="tier-section tier2">
+                        <h3>💪 TIER 2: POWER-UPS (Click to expand)</h3>
+                        
+                        <!-- Physical Health -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>⚔️ Physical Health (STRENGTH)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="full_workout"> Full workout 30min (25p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="light_exercise"> Light exercise 15min (12p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="push_ups_100"> 100 push-ups (20p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="steps_10k"> 10k+ steps (8p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="stretching"> Stretching 10min (5p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="cold_shower"> Cold shower (3p)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mental Development -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>🧠 Mental Development (INTELLECT)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="deep_work"> Deep work 50min (20p)
+                                        <select name="deep_work_quality" class="quality-select">
+                                            <option value="A">A-Grade</option>
+                                            <option value="B" selected>B-Grade</option>
+                                            <option value="C">C-Grade</option>
+                                        </select>
+                                    </label>
+                                    <label class="checkbox-label"><input type="checkbox" name="study_pomodoro"> Study 25min (8p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="project_dev"> Project dev 30min (15p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="part_time_job"> Part-time job 1hr (20p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="new_skill"> Learn new skill 30min (10p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="read_book"> Read 20min (10p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="kinnu"> Kinnu lesson (5p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="online_course"> Online course module (12p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="code_practice"> Code practice 30min (15p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="journal"> Journal 10min (5p)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Digital Wellness -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>📱 Digital Wellness (DISCIPLINE)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="screen_under_2h"> Screen time <2h (15p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="screen_2_4h"> Screen time 2-4h (5p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="no_phone_morning"> No phone 1st hour awake (5p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="no_phone_night"> No phone last hour bed (5p)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Life Admin -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>📋 Life Admin (ENERGY)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="plan_tomorrow"> Plan tomorrow 10min (3p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="organize_space"> Organize space 30min (8p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="budget_review"> Budget review (5p)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mindfulness -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>🧘 Mindfulness (ENERGY)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="meditation"> Meditation 10min (8p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="gratitude"> Gratitude practice (3p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="breathwork"> Breathwork 5min (4p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="nature_walk"> Nature walk 30min (10p)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Creative Output -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>💻 Creative Output (INFLUENCE)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="code_project"> Code project 30min (20p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="write_docs"> Write docs 30min (10p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="build_design"> Build/design 1hr (15p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="open_source"> Open source contrib (25p)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social & Contribution -->
+                        <div class="accordion-item">
+                            <div class="accordion-header">
+                                <h4>👥 Social & Contribution (INFLUENCE)</h4>
+                                <span class="accordion-icon">▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="activity-group">
+                                    <label class="checkbox-label"><input type="checkbox" name="meaningful_conversation"> Meaningful conversation 20min (8p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="help_someone_code"> Help someone with code (10p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="call_family"> Call family/friend (5p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="help_someone"> Help someone out (3p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="teach_someone"> Teach someone something (6p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="give_advice"> Give thoughtful advice (5p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="active_listening"> Active listening session 15min (4p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="encourage_someone"> Encourage/motivate someone (3p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="group_activity"> Group activity/hangout 1hr (7p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="mentor_session"> Mentor someone 30min (8p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="networking"> Networking/make new connection (6p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="compliment_someone"> Give genuine compliment (2p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="thank_someone"> Thank someone meaningfully (2p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="check_in"> Check in on someone (3p)</label>
+                                    <label class="checkbox-label"><input type="checkbox" name="quality_time"> Quality time with loved one 1hr (10p)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tier 3: Boss Moves -->
+                    <div class="tier-section tier3">
+                        <h3>🔥 TIER 3: BOSS MOVES</h3>
+                        <label class="checkbox-label"><input type="checkbox" name="flow_state_4h"> 4+ hours deep work (80p + achievement)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="zero_screens"> Zero screens all day (100p + badge)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="complete_todo"> Complete full to-do list (50p)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="cold_exposure"> Cold exposure 3min (30p)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="new_algorithm"> Learn new algorithm (60p)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="teach_code"> Teach coding 1hr (40p)</label>
+                    </div>
+
+                    <!-- Streaks Completed -->
+                    <div class="tier-section">
+                        <h3>🔥 Streaks Completed Today</h3>
+                        <p class="hint">Check all streaks you maintained today</p>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_no_porn" value="no_porn"> No Porn</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_workout" value="workout"> Workout</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_sleep" value="sleep_7h"> 7+ Hours Sleep</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_morning" value="morning_routine"> Morning Routine</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_doomscroll" value="no_doomscroll"> No Doomscroll</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_deepwork" value="deep_work"> Deep Work</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_reading" value="reading"> Reading</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_screen" value="screen_time_under_2h"> Screen <2h</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_meditation" value="meditation"> Meditation</label>
+                        <label class="checkbox-label"><input type="checkbox" name="streak_coding" value="coding_practice"> Coding Practice</label>
+                    </div>
+
+                    <!-- Energy & Notes -->
+                    <div class="tier-section">
+                        <h3>📊 Day Summary</h3>
+                        <label>
+                            Energy Score (1-10):
+                            <input type="number" name="energy_score" min="1" max="10" value="5">
+                        </label>
+                        <label>
+                            Notes (optional):
+                            <textarea name="notes" rows="3" placeholder="How did today go?"></textarea>
+                        </label>
+                        <label class="checkbox-label penalty">
+                            <input type="checkbox" name="penalty_gaming">
+                            <span>All-day gaming/binging (-15p)</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">✅ Submit Quest Log</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PR Tracker Modal -->
+    <div id="pr-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💪 Log Personal Record</h2>
+                <span class="close-pr">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="pr-form">
+                    <div class="form-group">
+                        <label for="exercise-name">Exercise Name</label>
+                        <input type="text" id="exercise-name" name="exercise_name" 
+                               placeholder="e.g., Bench Press, Squat, Deadlift" 
+                               list="exercise-suggestions" required>
+                        <datalist id="exercise-suggestions">
+                            <option value="Bench Press">
+                            <option value="Squat">
+                            <option value="Deadlift">
+                            <option value="Overhead Press">
+                            <option value="Barbell Row">
+                            <option value="Pull-ups">
+                            <option value="Dips">
+                            <option value="Leg Press">
+                            <option value="Romanian Deadlift">
+                            <option value="Bicep Curls">
+                            <option value="Tricep Extensions">
+                            <option value="Lateral Raises">
+                        </datalist>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="weight">Weight (kg/lbs)</label>
+                            <input type="number" id="weight" name="weight" step="0.5" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="reps">Reps</label>
+                            <input type="number" id="reps" name="reps" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sets">Sets</label>
+                            <input type="number" id="sets" name="sets" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="pr-info">
+                        <p><strong>Total Volume:</strong> <span id="volume-display">0</span> (weight × reps × sets)</p>
+                        <p class="hint">📊 PRs are tracked by total volume. Beat your previous volume to earn points!</p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">✅ Log PR</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes & Planning Modal -->
+    <div id="notes-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Add Note or Plan</h2>
+                <span class="close-notes">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="notes-form">
+                    <!-- Note Type Selection -->
+                    <div class="note-type-selector">
+                        <label class="note-type-option">
+                            <input type="radio" name="note_type" value="daily_note" checked>
+                            <div class="note-type-card">
+                                <div class="note-type-icon">📔</div>
+                                <div class="note-type-title">Daily Note</div>
+                                <div class="note-type-points">+2 points</div>
+                                <div class="note-type-desc">Journal entry, reflection, or observation</div>
+                            </div>
+                        </label>
+                        
+                        <label class="note-type-option">
+                            <input type="radio" name="note_type" value="tomorrow_plan">
+                            <div class="note-type-card">
+                                <div class="note-type-icon">🎯</div>
+                                <div class="note-type-title">Tomorrow's Plan</div>
+                                <div class="note-type-points">+5 points (+3 when done)</div>
+                                <div class="note-type-desc">What you'll accomplish tomorrow</div>
+                            </div>
+                        </label>
+                        
+                        <label class="note-type-option">
+                            <input type="radio" name="note_type" value="goal">
+                            <div class="note-type-card">
+                                <div class="note-type-icon">🏆</div>
+                                <div class="note-type-title">Long-term Goal</div>
+                                <div class="note-type-points">+3 points (+5 when done)</div>
+                                <div class="note-type-desc">Goal with deadline</div>
+                            </div>
+                        </label>
+                        
+                        <label class="note-type-option">
+                            <input type="radio" name="note_type" value="idea">
+                            <div class="note-type-card">
+                                <div class="note-type-icon">💡</div>
+                                <div class="note-type-title">Quick Idea</div>
+                                <div class="note-type-points">+1 point</div>
+                                <div class="note-type-desc">Random thought or inspiration</div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Category Selection -->
+                    <div class="form-group">
+                        <label for="note-category">Category</label>
+                        <select id="note-category" name="category">
+                            <option value="general">General</option>
+                            <option value="work">Work/Career</option>
+                            <option value="fitness">Fitness/Health</option>
+                            <option value="learning">Learning/Study</option>
+                            <option value="coding">Coding/Projects</option>
+                            <option value="personal">Personal Growth</option>
+                            <option value="relationships">Relationships</option>
+                            <option value="finance">Finance</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Target Date (for goals) -->
+                    <div class="form-group" id="target-date-group" style="display: none;">
+                        <label for="target-date">Target Date (optional)</label>
+                        <input type="date" id="target-date" name="target_date">
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="form-group">
+                        <label for="note-content">Content</label>
+                        <textarea id="note-content" name="content" rows="6" 
+                                  placeholder="Write your note, plan, goal, or idea here..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">✅ Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div id="achievement-popup" class="achievement-popup" style="display: none;">
+        <div class="achievement-content">
+            <h2>🏆 ACHIEVEMENT UNLOCKED!</h2>
+            <div id="achievement-details"></div>
+        </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div id="budget-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💵 Add Transaction</h2>
+                <span class="close-budget">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="budget-form">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="type" required>
+                            <option value="income">💰 Income</option>
+                            <option value="expense">💸 Expense</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" name="amount" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" required>
+                            <option value="Food">Food</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Fitness">Fitness</option>
+                            <option value="Learning">Learning</option>
+                            <option value="Bills">Bills</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Salary">Salary</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description (optional)</label>
+                        <input type="text" name="description" placeholder="e.g., Grocery shopping">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">✅ Add Transaction (+2p)</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workout Modal -->
+    <div id="workout-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Log Workout</h2>
+                <span class="close-workout">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="workout-form">
+                    <div class="form-group">
+                        <label>Workout Name</label>
+                        <input type="text" name="name" placeholder="e.g., Push Day, Leg Day" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Exercises (one per line)</label>
+                        <textarea name="exercises" rows="6" placeholder="Bench Press 3x10&#10;Incline Press 3x12&#10;Tricep Dips 3x15" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" name="duration" value="30" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notes (optional)</label>
+                        <textarea name="notes" rows="2" placeholder="How did it go?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">✅ Log Workout (25-40p)</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
