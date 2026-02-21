@@ -81,16 +81,16 @@
 ## 📸 Demo
 
 ### Dashboard Overview
-*[screenshots/dashboard.jpg]*
+*[/screenshots/dashboard.jpg]*
 
 ### Quest Logging
-*[screenshots/logs.jpg]*
+*[/screenshots/logs.jpg]*
 
 ### Analytics
-*[screenshots/analytics.jpg]*
+*[/screenshots/analytics.jpg]*
 
 ### Budget Tracker
-*[screenshots/budget.jpg]*
+*[/screenshots/budget.jpg]*
 
 ---
 
