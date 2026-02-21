@@ -8,11 +8,15 @@ import json
 import os
 from datetime import datetime, timedelta
 from collections import defaultdict
+from db_adapter import DatabaseAdapter
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'warrior-dashboard-secret-key-2024'
+app.config['SECRET_KEY'] = 'warrior-dashboard-secret-key-2026'
 
-# Data file path
+# Initialize database adapter (uses SQLite by default)
+db = DatabaseAdapter(storage_type='sqlite')
+
+# Legacy - for backward compatibility
 DATA_FILE = 'data/character_data.json'
 
 # Initialize data structure
@@ -146,20 +150,16 @@ def init_data():
     }
 
 def load_data():
-    """Load data from JSON file or create new if doesn't exist"""
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r') as f:
-            return json.load(f)
-    else:
+    """Load data from current storage (JSON or SQLite)"""
+    data = db.load_data()
+    if data is None:
         data = init_data()
         save_data(data)
-        return data
+    return data
 
 def save_data(data):
-    """Save data to JSON file"""
-    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f, indent=2)
+    """Save data to current storage (JSON or SQLite)"""
+    db.save_data(data)
 
 def calculate_streak_multiplier(days):
     """Calculate streak multiplier based on days"""
@@ -310,6 +310,20 @@ def index():
     """Main dashboard page"""
     data = load_data()
     return render_template('index.html', data=data)
+
+@app.route('/api/storage-info')
+def storage_info():
+    """Get current storage type and info"""
+    storage_type = db.get_storage_type()
+    
+    info = {
+        'storage_type': storage_type,
+        'can_migrate': storage_type == 'json',
+        'database_file': 'data/warrior_dashboard.db' if storage_type == 'sqlite' else None,
+        'json_file': 'data/character_data.json' if storage_type == 'json' else None
+    }
+    
+    return jsonify(info)
 
 @app.route('/api/character')
 def get_character():

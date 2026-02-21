@@ -7,13 +7,14 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 [Features](#-features) • [Demo](#-demo) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
 ---
 
-![Dashboard Preview](screenshots/dashboard.jpg)
+![Dashboard Preview](https://via.placeholder.com/800x400/0a0e27/00d9ff?text=Warrior+Dashboard+Screenshot)
 
 </div>
 
@@ -69,9 +70,10 @@
 ### 🔧 Technical
 
 - **Self-Hosted** — Your data, your server, full control
-- **No Database Required** — Uses JSON for simplicity (easily migrate to PostgreSQL later)
+- **JSON or SQLite Storage** — Simple JSON files or SQLite database (migration script included)
+- **Docker Support** — One-command deployment with Docker Compose
 - **REST API** — All features accessible via endpoints
-- **Zero Dependencies** — Just Flask, that's it
+- **Minimal Dependencies** — Just Flask, that's it
 - **Instant Setup** — Running in under 5 minutes
 
 ---
@@ -79,45 +81,55 @@
 ## 📸 Demo
 
 ### Dashboard Overview
-*[Screenshot: Main dashboard showing stats, streaks, and today's summary]*
+*[screenshots/dashboard.jpg]*
 
 ### Quest Logging
-*[Screenshot: Modal with collapsible activity categories]*
+*[screenshots/logs.jpg]*
 
 ### Analytics
-*[Screenshot: Charts showing weekly trends and activity breakdown]*
+*[screenshots/analytics.jpg]*
 
 ### Budget Tracker
-*[Screenshot: Transactions and balance overview]*
+*[screenshots/budget.jpg]*
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Python 3.8 or higher
-- That's it. Seriously.
-
-### Installation
+### 🐳 Option 1: Docker (Recommended)
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/warrior-dashboard.git
+git clone https://github.com/E-Ecstacy/warrior-dashboard.git
 cd warrior-dashboard
 
-# Install Flask (only dependency)
+# Start with Docker Compose
+docker compose up -d
+
+# Open your browser
+# http://localhost:5000
+```
+
+That's it! Your data is persisted in the `./data` folder.
+
+### 🐍 Option 2: Python (Traditional)
+
+**Prerequisites:** Python 3.8 or higher
+
+```bash
+# Clone the repository
+git clone https://github.com/E-Ecstacy/warrior-dashboard.git
+cd warrior-dashboard
+
+# Install Flask
 pip install Flask
 
 # Run the application
 python app.py
+
+# Open your browser
+# http://localhost:5000
 ```
-
-### Open Your Dashboard
-
-Navigate to **http://localhost:5000** in your browser.
-
-That's it. You're running.
 
 ---
 
@@ -305,10 +317,26 @@ Edit CSS variables in `static/css/style.css` (lines 1-20):
 
 ## 📊 Data Management
 
+### Database Storage
+
+**New users:** Automatically use SQLite (single `.db` file, no corruption risk)
+
+**Existing JSON users:** Migrate to SQLite in 10 seconds:
+
+```bash
+python migrate_to_sqlite.py
+```
+
+Your data is automatically backed up before migration!
+
 ### Backup Your Data
 
-Your entire character data is in one file:
+**SQLite (recommended):**
+```bash
+cp data/warrior_dashboard.db backup_YYYYMMDD.db
+```
 
+**JSON (legacy):**
 ```bash
 cp data/character_data.json backup_YYYYMMDD.json
 ```
@@ -326,10 +354,6 @@ curl -X POST http://localhost:5000/api/reset
 ```
 
 ⚠️ **This deletes all your progress!**
-
-### Migrate to PostgreSQL
-
-Want to scale up? Your JSON structure maps directly to database tables. See [SCALING.md](SCALING.md) for guide.
 
 ---
 
@@ -414,9 +438,12 @@ This started as a personal project, but I'm open to contributions!
 - [x] Analytics dashboard
 - [x] Multiple logs per day
 - [x] Dark cyberpunk UI
+- [x] Docker support
+- [x] SQLite database option
 
 ### 🚧 In Progress
 
+- [ ] Custom skill trees (community-requested)
 - [ ] Better mobile experience
 - [ ] Export to CSV/Excel
 - [ ] Import from other apps
@@ -432,7 +459,7 @@ This started as a personal project, but I'm open to contributions!
 - [ ] API webhooks
 - [ ] Zapier integration
 
-**Want something specific?** [Open an issue](https://github.com/yourusername/warrior-dashboard/issues)!
+**Want something specific?** [Open an issue](https://github.com/E-Ecstacy/warrior-dashboard/issues)!
 
 ---
 
@@ -509,9 +536,35 @@ They're in collapsible sections! Click the category headers (▼ arrow) to expan
 
 ## 📜 License
 
-MIT License — Do whatever you want with it!
+MIT License — Free and open source forever!
 
 See [LICENSE](LICENSE) for details.
+
+---
+
+## 💰 Support This Project
+
+This project is **100% free and open source** (MIT License) and always will be.
+
+**Need help getting started?**
+
+I offer premium support packages with:
+- 🎥 Video setup tutorials
+- 📖 Detailed customization guides
+- ✉️ Priority email support
+- 🛠️ One-on-one setup assistance
+
+**The source code is identical.** You're paying for my time and expertise, not the code.
+
+Want to DIY? Everything you need is right here on GitHub!
+
+Want support? [Check out premium packages](https://gumroad.com) (coming soon)
+
+**Or support via:**
+- ⭐ Star this repo
+- 🐛 Report bugs
+- 💡 Suggest features
+- 🤝 Contribute code
 
 ---
 
@@ -533,13 +586,13 @@ See [LICENSE](LICENSE) for details.
 
 ## 📬 Contact
 
-**Creator:** [Komron]
+**Creator:** 15-year-old developer
 - GitHub: [@E-Ecstacy](https://github.com/E-Ecstacy)
-- Email: komronnormamatov1@gmail.com
+- Repo: [warrior-dashboard](https://github.com/E-Ecstacy/warrior-dashboard)
 
 **Found this useful?** Give it a ⭐ star on GitHub!
 
-**Want to support development?** [Buy me a coffee](https://ko-fi.com/yourusername) ☕
+**Questions or bugs?** [Open an issue](https://github.com/E-Ecstacy/warrior-dashboard/issues)
 
 ---
 

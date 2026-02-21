@@ -16,4 +16,5 @@ build
 README.md
 LICENSE
 .DS_Store
-data/character_data.json
+data/*.json
+data/*.backup_*

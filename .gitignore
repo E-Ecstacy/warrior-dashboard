@@ -28,7 +28,9 @@ instance/
 .webassets-cache
 
 # Data (comment out if you want to track your own data)
-#data/character_data.json
+data/character_data.json
+data/*.backup_*
+data/warrior_dashboard.db
 
 # IDEs
 .vscode/
