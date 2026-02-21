@@ -14,7 +14,7 @@
 
 ---
 
-![Dashboard Preview](https://via.placeholder.com/800x400/0a0e27/00d9ff?text=Warrior+Dashboard+Screenshot)
+![Dashboard Preview](/screenshots/dashboard.jpg)
 
 </div>
 
@@ -81,16 +81,16 @@
 ## 📸 Demo
 
 ### Dashboard Overview
-*[/screenshots/dashboard.jpg]*
+![Dashboard Overview](screenshots/dashboard.jpg)
 
 ### Quest Logging
-*[/screenshots/logs.jpg]*
+![Quest Logging](screenshots/logs.jpg)
 
 ### Analytics
-*[/screenshots/analytics.jpg]*
+![Analytics](screenshots/analytics.jpg)
 
 ### Budget Tracker
-*[/screenshots/budget.jpg]*
+![Budget Tracker](screenshots/budget.jpg)
 
 ---
 
