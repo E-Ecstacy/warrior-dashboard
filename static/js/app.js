@@ -465,6 +465,11 @@ async function handleQuestSubmit(e) {
         const result = await response.json();
         
         if (result.success) {
+            // Show combo notification if combos detected
+            if (result.combos_activated && result.combos_activated.length > 0) {
+                showComboPopup(result.combos_activated, result.combo_bonus);
+            }
+            
             // Show achievements if any
             if (result.achievements && result.achievements.length > 0) {
                 showAchievementPopup(result.achievements);
@@ -474,6 +479,11 @@ async function handleQuestSubmit(e) {
             let message = result.merged 
                 ? `✅ Activities Added to Today!\n\n🎯 New Points This Session: ${result.total_points}\n💡 ${result.message}\n\n📊 All today's activities are now combined in one entry!`
                 : `✅ Quest Complete!\n\n🎯 Total Points: ${result.total_points}\n\n💪 Keep building your character!`;
+            
+            // Add combo info to message if present
+            if (result.combo_bonus > 0) {
+                message += `\n\n⚡ COMBO BONUS: +${result.combo_bonus}p!`;
+            }
             
             alert(message);
             
@@ -514,6 +524,70 @@ function showAchievementPopup(achievements) {
     // Click to close
     popup.addEventListener('click', () => {
         popup.style.display = 'none';
+    });
+}
+
+// Show combo popup
+function showComboPopup(combos, totalBonus) {
+    // Create combo notification element if it doesn't exist
+    let comboNotif = document.getElementById('combo-notification');
+    if (!comboNotif) {
+        comboNotif = document.createElement('div');
+        comboNotif.id = 'combo-notification';
+        comboNotif.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffd60a, #ff006e);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(255, 214, 10, 0.5);
+            z-index: 10000;
+            text-align: center;
+            min-width: 400px;
+            display: none;
+        `;
+        document.body.appendChild(comboNotif);
+        
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes comboPopIn {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                50% { transform: translate(-50%, -50%) scale(1.1); }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            }
+            #combo-notification { animation: comboPopIn 0.5s ease; }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    comboNotif.innerHTML = `
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⚡🔥⚡</div>
+        <h2 style="color: white; margin: 0 0 1rem 0; font-size: 2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            COMBO ${combos.length > 1 ? 'CHAIN' : 'ACTIVATED'}!
+        </h2>
+        ${combos.map(combo => `
+            <div style="background: rgba(255,255,255,0.2); padding: 0.8rem; margin: 0.5rem 0; border-radius: 10px;">
+                <div style="color: white; font-weight: bold; font-size: 1.2rem;">${combo}</div>
+            </div>
+        `).join('')}
+        <div style="margin-top: 1.5rem; font-size: 2rem; color: white; font-weight: bold; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+            +${totalBonus} BONUS POINTS!
+        </div>
+    `;
+    
+    comboNotif.style.display = 'block';
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        comboNotif.style.display = 'none';
+    }, 4000);
+    
+    // Click to close
+    comboNotif.addEventListener('click', () => {
+        comboNotif.style.display = 'none';
     });
 }
 

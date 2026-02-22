@@ -1,4 +1,4 @@
-/*Warrior Dashboard - Dark Cyberpunk Theme */
+/* Warrior Dashboard - Dark Cyberpunk Theme */
 
 :root {
     --bg-primary: #0a0e27;
@@ -1602,4 +1602,75 @@ textarea {
 .budget-actions,
 .workout-actions {
     margin-bottom: 1.5rem;
+}
+
+/* Combo Reference Card */
+.combo-reference-card {
+    background: linear-gradient(135deg, rgba(255, 214, 10, 0.1), rgba(255, 0, 110, 0.1));
+    border: 2px solid var(--accent-gold);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.combo-reference-card:hover {
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 20px rgba(255, 214, 10, 0.3);
+}
+
+.combo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: var(--accent-gold);
+    font-size: 1.1rem;
+}
+
+.toggle-arrow {
+    transition: transform 0.3s ease;
+}
+
+.combo-reference-card.expanded .toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.combo-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    margin-top: 0;
+}
+
+.combo-reference-card.expanded .combo-list {
+    max-height: 600px;
+    margin-top: 1rem;
+}
+
+.combo-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-cyan);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.combo-item strong {
+    color: var(--accent-gold);
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.combo-item.ultimate {
+    border-left-color: var(--accent-pink);
+    background: rgba(255, 0, 110, 0.1);
+}
+
+.combo-item.ultimate strong {
+    color: var(--accent-pink);
+    font-size: 1.1rem;
 }

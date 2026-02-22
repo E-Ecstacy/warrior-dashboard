@@ -11,7 +11,7 @@ from collections import defaultdict
 from db_adapter import DatabaseAdapter
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'warrior-dashboard-secret-key-2026'
+app.config['SECRET_KEY'] = 'warrior-dashboard-secret-key-2024'
 
 # Initialize database adapter (uses SQLite by default)
 db = DatabaseAdapter(storage_type='sqlite')
@@ -209,32 +209,97 @@ def generate_daily_challenge():
     return random.choice(challenges)
 
 def check_combo(activities_done):
-    """Check if activities form a combo chain"""
+    """Check if activities form a combo chain - returns list of detected combos with bonus points"""
     combos = {
         "morning_warrior": {
-            "activities": ["workout", "cold_shower", "healthy_meal"],
-            "multiplier": 1.5,
-            "name": "Morning Warrior"
+            "activities": ["full_workout", "cold_shower", "meditation"],
+            "bonus_points": 15,
+            "name": "Morning Warrior",
+            "description": "Workout + Cold Shower + Meditation"
         },
         "productive_start": {
-            "activities": ["wake_early", "morning_routine", "deep_work"],
-            "multiplier": 1.3,
-            "name": "Productive Start"
+            "activities": ["full_workout", "deep_work", "plan_tomorrow"],
+            "bonus_points": 20,
+            "name": "Productive Start",
+            "description": "Workout + Deep Work + Planning"
         },
-        "code_master": {
-            "activities": ["code_session", "document", "github_push"],
-            "multiplier": 1.4,
-            "name": "Code Master"
+        "code_athlete": {
+            "activities": ["full_workout", "code_practice", "stretching"],
+            "bonus_points": 18,
+            "name": "Code Athlete",
+            "description": "Workout + Code + Stretching"
         },
-        "wellness_stack": {
-            "activities": ["meditation", "exercise", "healthy_meal"],
-            "multiplier": 1.3,
-            "name": "Wellness Stack"
+        "jack_of_exercises": {
+            "activities": ["light_exercise", "project_dev", "read_book"],
+            "bonus_points": 12,
+            "name": "Jack of Exercises",
+            "description": "Light Exercise + Project + Reading"
         },
-        "learning_streak": {
-            "activities": ["read", "study", "practice"],
-            "multiplier": 1.3,
-            "name": "Learning Streak"
+        "mind_body_stack": {
+            "activities": ["meditation", "full_workout", "journal"],
+            "bonus_points": 15,
+            "name": "Mind-Body Stack",
+            "description": "Meditation + Workout + Journaling"
+        },
+        "wellness_warrior": {
+            "activities": ["meditation", "stretching", "gratitude"],
+            "bonus_points": 10,
+            "name": "Wellness Warrior",
+            "description": "Meditation + Stretching + Gratitude"
+        },
+        "social_fitness": {
+            "activities": ["full_workout", "meaningful_conversation", "group_activity"],
+            "bonus_points": 18,
+            "name": "Social Fitness",
+            "description": "Workout + Conversation + Group Activity"
+        },
+        "recovery_master": {
+            "activities": ["stretching", "cold_shower", "meditation", "breathwork"],
+            "bonus_points": 12,
+            "name": "Recovery Master",
+            "description": "Stretching + Cold Shower + Meditation + Breathwork"
+        },
+        "balanced_beast": {
+            "activities": ["full_workout", "deep_work", "meditation", "read_book"],
+            "bonus_points": 25,
+            "name": "Balanced Beast",
+            "description": "Workout + Deep Work + Meditation + Reading"
+        },
+        "cardio_coder": {
+            "activities": ["steps_10k", "code_practice", "online_course"],
+            "bonus_points": 15,
+            "name": "Cardio Coder",
+            "description": "10k Steps + Code Practice + Online Course"
+        },
+        "strength_scholar": {
+            "activities": ["push_ups_100", "study_pomodoro", "new_skill"],
+            "bonus_points": 15,
+            "name": "Strength Scholar",
+            "description": "100 Push-ups + Study + New Skill"
+        },
+        "zen_productivity": {
+            "activities": ["meditation", "deep_work", "organize_space"],
+            "bonus_points": 12,
+            "name": "Zen Productivity",
+            "description": "Meditation + Deep Work + Organize Space"
+        },
+        "active_learner": {
+            "activities": ["light_exercise", "online_course", "nature_walk"],
+            "bonus_points": 14,
+            "name": "Active Learner",
+            "description": "Light Exercise + Course + Nature Walk"
+        },
+        "creative_fitness": {
+            "activities": ["full_workout", "code_project", "build_design"],
+            "bonus_points": 22,
+            "name": "Creative Fitness",
+            "description": "Workout + Code Project + Design"
+        },
+        "ultimate_day": {
+            "activities": ["full_workout", "deep_work", "meditation", "read_book", "code_practice", "meaningful_conversation"],
+            "bonus_points": 50,
+            "name": "Ultimate Day",
+            "description": "Workout + Deep Work + Meditation + Reading + Code + Conversation"
         }
     }
     
@@ -622,28 +687,42 @@ def daily_log():
                 data['nemesis_mode']['nemesis_gauge'] = 0
         
         # CHECK COMBO SYSTEM
+        # Build list of all completed tier2 activities
         activities_completed = []
-        if tier2.get('full_workout'): activities_completed.append('workout')
-        if tier2.get('cold_shower'): activities_completed.append('cold_shower')
-        if tier2.get('meditation'): activities_completed.append('meditation')
-        if tier2.get('deep_work'): activities_completed.append('deep_work')
-        if tier2.get('code_practice'): activities_completed.append('code_session')
-        if tier2.get('read_book'): activities_completed.append('read')
+        for activity_name, is_done in tier2.items():
+            if is_done and activity_name != 'deep_work_quality':  # Skip quality indicator
+                activities_completed.append(activity_name)
+        
+        # Check combos across ALL logs today (merge with previous logs if exists)
+        today = datetime.now().strftime('%Y-%m-%d')
+        existing_entry = next((e for e in data['daily_log'] if e.get('date') == today), None)
+        
+        if existing_entry:
+            # Merge activities from previous logs today
+            existing_tier2 = existing_entry.get('tier2', {})
+            for activity_name, is_done in existing_tier2.items():
+                if is_done and activity_name not in activities_completed and activity_name != 'deep_work_quality':
+                    activities_completed.append(activity_name)
         
         detected_combos = check_combo(activities_completed)
         combo_bonus = 0
+        combo_names = []
+        
         if detected_combos:
-            best_combo = max(detected_combos, key=lambda x: x['multiplier'])
-            combo_multiplier = best_combo['multiplier']
-            combo_bonus = int(total_points * (combo_multiplier - 1))
+            # Award ALL detected combos (not just best one)
+            for combo in detected_combos:
+                combo_bonus += combo['bonus_points']
+                combo_names.append(combo['name'])
+            
             total_points += combo_bonus
-            entry['combo_activated'] = best_combo['name']
+            entry['combos_activated'] = combo_names
             entry['combo_bonus'] = combo_bonus
             
             # Update combo stats
             if 'combo_system' not in data:
-                data['combo_system'] = {'active_combo': [], 'combo_multiplier': 1.0, 'best_combo': 0, 'total_combos': 0}
-            data['combo_system']['total_combos'] += 1
+                data['combo_system'] = {'total_combos': 0, 'best_combo': 0, 'all_time_bonus': 0}
+            data['combo_system']['total_combos'] += len(detected_combos)
+            data['combo_system']['all_time_bonus'] = data['combo_system'].get('all_time_bonus', 0) + combo_bonus
             if combo_bonus > data['combo_system'].get('best_combo', 0):
                 data['combo_system']['best_combo'] = combo_bonus
         
@@ -708,10 +787,10 @@ def daily_log():
                     existing_entry['notes'] = new_notes
             
             # Combine combo info
-            if entry.get('combo_activated'):
-                existing_combos = existing_entry.get('all_combos', [])
-                existing_combos.append(entry['combo_activated'])
-                existing_entry['all_combos'] = existing_combos
+            if combo_names:
+                existing_combos = existing_entry.get('combos_activated', [])
+                existing_combos.extend(combo_names)
+                existing_entry['combos_activated'] = existing_combos
                 existing_entry['combo_bonus'] = existing_entry.get('combo_bonus', 0) + combo_bonus
             
             # Track that this was an update
@@ -732,7 +811,9 @@ def daily_log():
             'achievements': new_achievements,
             'stat_xp': dict(stat_xp),
             'merged': existing_entry is not None,
-            'message': 'Activities added to today\'s log!' if existing_entry else 'New daily log created!'
+            'message': 'Activities added to today\'s log!' if existing_entry else 'New daily log created!',
+            'combos_activated': combo_names if combo_names else [],
+            'combo_bonus': combo_bonus
         })
     
     else:

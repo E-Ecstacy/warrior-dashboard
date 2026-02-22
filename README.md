@@ -53,7 +53,7 @@
 - **📝 Notes & Planning** — Daily notes, tomorrow's plans, goals, ideas (2-5p each)
 - **🏋️ Personal Records** — Track workout PRs, automatic volume calculation, progressive point rewards
 - **🎲 Daily Challenges** — Random challenge each day (No Caffeine, Ice Bath, Silent Workout, etc.)
-- **⚡ Combo System** — Chain activities for multiplier bonuses (Morning Warrior, Code Master, etc.)
+- **⚡ Combo System** — 15 auto-detected activity chains award bonus points (Ultimate Day: +50p, Balanced Beast: +25p Morning Warrior: +15p). No double counting, multiple combos per day, visible in quest modal
 - **💀 Nemesis Mode** (Optional) — Choose 3 non-negotiables, break one = ZERO points that day
 - **👻 Ghost Data** — Compare today vs last week, track your best week ever
 - **📊 Analytics Dashboard** — Total days, averages, best/worst days, activity breakdown, weekly trends
