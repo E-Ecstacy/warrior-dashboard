@@ -237,6 +237,18 @@
             </div>
         </section>
 
+        <!-- Programming Skill Tree -->
+        <section class="programming-section">
+            <h2>💻 PROGRAMMING SKILL TREE</h2>
+            <div class="programming-actions">
+                <button class="btn btn-primary" id="open-programming-modal">🐍 Log Python Session</button>
+            </div>
+            
+            <div class="programming-skills" id="programming-skills-container">
+                <!-- Skills will be loaded here -->
+            </div>
+        </section>
+
         <!-- Skill Tree -->
         <section class="skill-tree-section">
             <h2>🌳 SKILL TREE</h2>
@@ -757,6 +769,44 @@
                     </div>
                     
                     <button type="submit" class="btn btn-success">✅ Log Workout (25-40p)</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programming Session Modal -->
+    <div id="programming-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🐍 Log Python Session</h2>
+                <span class="close-programming">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="programming-form">
+                    <div class="form-group">
+                        <label>Task Type</label>
+                        <select name="task_type" required>
+                            <option value="practice">Practice (1 XP/min, 10p base)</option>
+                            <option value="tutorial">Tutorial (0.8 XP/min, 8p base)</option>
+                            <option value="project">Project (1.5 XP/min, 15p base)</option>
+                            <option value="problem_solving">Problem Solving (2 XP/min, 20p base)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" name="duration" value="30" min="1" required>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+                            60+ min: +5p | 120+ min: +15p total
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>What did you work on? (optional)</label>
+                        <input type="text" name="description" placeholder="e.g., Flask API, Data structures">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">✅ Log Session</button>
                 </form>
             </div>
         </div>

@@ -62,6 +62,16 @@ function setupEventListeners() {
         document.getElementById('workout-modal').style.display = 'none';
     });
     
+    // Open programming modal
+    document.getElementById('open-programming-modal')?.addEventListener('click', () => {
+        document.getElementById('programming-modal').style.display = 'block';
+    });
+    
+    // Close programming modal
+    document.querySelector('.close-programming')?.addEventListener('click', () => {
+        document.getElementById('programming-modal').style.display = 'none';
+    });
+    
     // Close modals on outside click
     window.addEventListener('click', (e) => {
         const questModal = document.getElementById('quest-modal');
@@ -69,6 +79,7 @@ function setupEventListeners() {
         const notesModal = document.getElementById('notes-modal');
         const budgetModal = document.getElementById('budget-modal');
         const workoutModal = document.getElementById('workout-modal');
+        const programmingModal = document.getElementById('programming-modal');
         
         if (e.target === questModal) {
             questModal.style.display = 'none';
@@ -85,6 +96,9 @@ function setupEventListeners() {
         if (e.target === workoutModal) {
             workoutModal.style.display = 'none';
         }
+        if (e.target === programmingModal) {
+            programmingModal.style.display = 'none';
+        }
     });
     
     // Form submissions
@@ -93,6 +107,7 @@ function setupEventListeners() {
     document.getElementById('notes-form').addEventListener('submit', handleNotesSubmit);
     document.getElementById('budget-form').addEventListener('submit', handleBudgetSubmit);
     document.getElementById('workout-form').addEventListener('submit', handleWorkoutSubmit);
+    document.getElementById('programming-form')?.addEventListener('submit', handleProgrammingSubmit);
     
     // Setup accordion functionality
     setupAccordions();
@@ -186,6 +201,9 @@ async function loadDashboard() {
         
         // Load workout sessions
         loadWorkouts();
+        
+        // Load programming skills
+        loadProgrammingSkills();
         
         // Load new features
         loadDailyChallenge();
@@ -1341,5 +1359,90 @@ async function handleWorkoutSubmit(e) {
     } catch (error) {
         console.error('Error:', error);
         alert('Error logging workout. Please try again.');
+    }
+}
+
+
+// Programming Skill Tree Functions
+async function loadProgrammingSkills() {
+    try {
+        const response = await fetch("/api/programming-skills");
+        const data = await response.json();
+        
+        const container = document.getElementById("programming-skills-container");
+        
+        const python = data.languages.python;
+        const xpProgress = (python.xp / python.xp_to_next) * 100;
+        
+        container.innerHTML = `
+            <div class="programming-skill-card">
+                <div class="skill-header">
+                    <h3>🐍 Python</h3>
+                    <div class="skill-level">Level ${python.level}</div>
+                </div>
+                
+                <div class="skill-progress">
+                    <div class="skill-progress-bar">
+                        <div class="skill-progress-fill" style="width: ${xpProgress}%"></div>
+                    </div>
+                    <div class="skill-progress-text">${python.xp} / ${python.xp_to_next} XP</div>
+                </div>
+                
+                <div class="skill-stats">
+                    <div class="skill-stat"><span>Sessions:</span><strong>${python.total_sessions}</strong></div>
+                    <div class="skill-stat"><span>Hours:</span><strong>${python.total_hours.toFixed(1)}h</strong></div>
+                    <div class="skill-stat"><span>Rank:</span><strong>${python.milestones.length > 0 ? python.milestones[python.milestones.length - 1].title : "Beginner"}</strong></div>
+                </div>
+            </div>
+            
+            <div class="programming-sessions">
+                <h4>Recent Sessions:</h4>
+                ${data.session_history.length > 0 ? data.session_history.slice(-10).reverse().map(s => `
+                    <div class="session-card">
+                        <strong>${s.task_type.replace("_", " ")}</strong> - ${s.duration_minutes} min
+                        <br><span style="color: var(--accent-cyan);">+${s.xp_earned} XP</span> | <span style="color: var(--accent-green);">+${s.points_earned}p</span>
+                        ${s.description ? `<br><em>${s.description}</em>` : ""}
+                    </div>
+                `).join("") : "<p>No sessions yet!</p>"}
+            </div>
+        `;
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+async function handleProgrammingSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch("/api/programming-skills", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                action: "log_session",
+                language: "python",
+                task_type: formData.get("task_type"),
+                duration_minutes: parseInt(formData.get("duration")),
+                description: formData.get("description")
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            let msg = `🐍 +${result.xp_earned} XP | +${result.points_earned}p
+Level ${result.language_data.level}`;
+            if (result.leveled_up) msg += `
+
+🎉 LEVEL UP!`;
+            alert(msg);
+            document.getElementById("programming-modal").style.display = "none";
+            form.reset();
+            loadDashboard();
+        }
+    } catch (error) {
+        console.error("Error:", error);
     }
 }

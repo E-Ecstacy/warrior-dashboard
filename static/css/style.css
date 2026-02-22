@@ -1674,3 +1674,134 @@ textarea {
     color: var(--accent-pink);
     font-size: 1.1rem;
 }
+
+/* Programming Skill Tree Section */
+.programming-section {
+    margin-bottom: 3rem;
+}
+
+.programming-section h2 {
+    color: var(--intellect-color);
+    margin-bottom: 1.5rem;
+}
+
+.programming-skill-card {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 2px solid var(--intellect-color);
+    margin-bottom: 1.5rem;
+}
+
+.skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.skill-header h3 {
+    color: var(--intellect-color);
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.skill-level {
+    background: linear-gradient(135deg, var(--intellect-color), var(--accent-cyan));
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.skill-progress {
+    margin-bottom: 1.5rem;
+}
+
+.skill-progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    height: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.skill-progress-fill {
+    background: linear-gradient(90deg, var(--intellect-color), var(--accent-cyan));
+    height: 100%;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+}
+
+.skill-progress-text {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.skill-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.skill-stat {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.skill-stat span {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.skill-stat strong {
+    color: var(--intellect-color);
+    font-size: 1.3rem;
+}
+
+.programming-sessions {
+    margin-top: 2rem;
+}
+
+.programming-sessions h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.session-card {
+    background: rgba(0, 217, 255, 0.1);
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    border-left: 4px solid var(--intellect-color);
+    color: var(--text-primary);
+}
+
+.session-card strong {
+    color: var(--accent-cyan);
+    text-transform: capitalize;
+}
+
+.session-card em {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.close-programming {
+    color: var(--text-secondary);
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-programming:hover {
+    color: var(--intellect-color);
+}

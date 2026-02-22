@@ -146,6 +146,21 @@ def init_data():
         "workout_sessions": {
             "templates": {},
             "history": []
+        },
+        "programming_skill_tree": {
+            "languages": {
+                "python": {
+                    "name": "Python",
+                    "level": 1,
+                    "xp": 0,
+                    "xp_to_next": 100,
+                    "total_sessions": 0,
+                    "total_hours": 0,
+                    "milestones": [],
+                    "projects_completed": 0
+                }
+            },
+            "session_history": []
         }
     }
 
@@ -1551,6 +1566,103 @@ def workout_sessions():
             return jsonify({'success': True})
         
         return jsonify({'success': False, 'error': 'Template not found'}), 404
+
+@app.route('/api/programming-skills', methods=['GET', 'POST'])
+def programming_skills():
+    """Manage programming skill tree"""
+    data = load_data()
+    
+    if 'programming_skill_tree' not in data:
+        data['programming_skill_tree'] = {
+            'languages': {
+                'python': {'name': 'Python', 'level': 1, 'xp': 0, 'xp_to_next': 100, 'total_sessions': 0, 'total_hours': 0, 'milestones': [], 'projects_completed': 0}
+            },
+            'session_history': []
+        }
+    
+    if request.method == 'GET':
+        return jsonify({
+            'languages': data['programming_skill_tree']['languages'],
+            'session_history': data['programming_skill_tree']['session_history'][-30:]
+        })
+    
+    elif request.method == 'POST':
+        action = request.json.get('action')
+        
+        if action == 'log_session':
+            language = request.json.get('language', 'python')
+            duration_minutes = int(request.json.get('duration_minutes', 30))
+            task_type = request.json.get('task_type', 'practice')
+            description = request.json.get('description', '')
+            
+            if language not in data['programming_skill_tree']['languages']:
+                return jsonify({'success': False, 'error': 'Language not found'}), 404
+            
+            lang_data = data['programming_skill_tree']['languages'][language]
+            
+            # XP calculation
+            xp_per_minute = {'practice': 1, 'tutorial': 0.8, 'project': 1.5, 'problem_solving': 2}
+            xp_earned = int(duration_minutes * xp_per_minute.get(task_type, 1))
+            
+            # Points calculation
+            points_base = {'practice': 10, 'tutorial': 8, 'project': 15, 'problem_solving': 20}
+            points_earned = points_base.get(task_type, 10)
+            if duration_minutes >= 60: points_earned += 5
+            if duration_minutes >= 120: points_earned += 10
+            
+            # Add XP
+            lang_data['xp'] += xp_earned
+            lang_data['total_sessions'] += 1
+            lang_data['total_hours'] += duration_minutes / 60
+            
+            # Level up check
+            leveled_up = False
+            while lang_data['xp'] >= lang_data['xp_to_next']:
+                lang_data['xp'] -= lang_data['xp_to_next']
+                lang_data['level'] += 1
+                leveled_up = True
+                lang_data['xp_to_next'] = int(100 * (1.2 ** (lang_data['level'] - 1)))
+                
+                milestone_titles = {2: "Python Novice", 3: "Syntax Explorer", 5: "Function Master", 7: "OOP Apprentice", 
+                                   10: "Data Wrangler", 12: "Algorithm Solver", 15: "Framework Builder", 20: "Python Architect",
+                                   25: "Library Creator", 30: "Python Sage", 40: "Language Master", 50: "Python Legend"}
+                
+                milestone_title = next((milestone_titles[lvl] for lvl in sorted(milestone_titles.keys(), reverse=True) if lang_data['level'] >= lvl), "Python Beginner")
+                
+                lang_data['milestones'].append({
+                    'level': lang_data['level'],
+                    'date': datetime.now().strftime('%Y-%m-%d'),
+                    'title': milestone_title
+                })
+            
+            # Log session
+            session = {
+                'id': len(data['programming_skill_tree']['session_history']) + 1,
+                'language': language,
+                'date': datetime.now().strftime('%Y-%m-%d'),
+                'duration_minutes': duration_minutes,
+                'task_type': task_type,
+                'description': description,
+                'xp_earned': xp_earned,
+                'points_earned': points_earned,
+                'level_after': lang_data['level']
+            }
+            
+            data['programming_skill_tree']['session_history'].append(session)
+            data['character']['total_points'] += points_earned
+            data['skill_tree']['available_points'] += points_earned
+            add_xp_to_stat(data, 'intellect', points_earned)
+            
+            save_data(data)
+            
+            return jsonify({
+                'success': True,
+                'session': session,
+                'language_data': lang_data,
+                'leveled_up': leveled_up,
+                'xp_earned': xp_earned,
+                'points_earned': points_earned
+            })
 
 @app.route('/api/reset', methods=['POST'])
 def reset_data():
