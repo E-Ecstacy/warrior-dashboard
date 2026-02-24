@@ -14,9 +14,23 @@
 
 ---
 
-![Dashboard Preview](/screenshots/dashboard.jpg)
+### 📸 See It In Action
+
+![Dashboard Overview](screenshots/dashboard.jpg)
+*Main dashboard showing character stats, level, and weekly progress*
+
+![Quest Logging](screenshots/quest-logging.jpg)
+*Log daily activities with collapsible categories and combo system*
+
+![Analytics](screenshots/analytics.jpg)
+*Track your progress with detailed analytics and trends*
+
+![Budget Tracking](screenshots/budget-tracker.jpg)
+*Manage finances and earn points for discipline*
 
 </div>
+
+---
 
 ## 🎯 What Is This?
 
@@ -53,7 +67,7 @@
 - **📝 Notes & Planning** — Daily notes, tomorrow's plans, goals, ideas (2-5p each)
 - **🏋️ Personal Records** — Track workout PRs, automatic volume calculation, progressive point rewards
 - **🎲 Daily Challenges** — Random challenge each day (No Caffeine, Ice Bath, Silent Workout, etc.)
-- **⚡ Combo System** — 15 auto-detected activity chains award bonus points (Ultimate Day: +50p, Balanced Beast: +25p Morning Warrior: +15p). No double counting, multiple combos per day, visible in quest modal
+- **⚡ Combo System** — 15 auto-detected activity chains award bonus points (Ultimate Day: +50p, Balanced Beast: +25p, Morning Warrior: +15p). No double counting, multiple combos per day, visible in quest modal
 - **💀 Nemesis Mode** (Optional) — Choose 3 non-negotiables, break one = ZERO points that day
 - **👻 Ghost Data** — Compare today vs last week, track your best week ever
 - **📊 Analytics Dashboard** — Total days, averages, best/worst days, activity breakdown, weekly trends
@@ -177,7 +191,10 @@ python app.py
 
 **Streaks** — Daily completion × multiplier (1.5x at 7 days, 2.0x at 30 days)
 
-**Combos** — Chain activities for 1.3-1.5x multipliers
+**Combos** — 15 activity chains award bonus points (NO double counting):
+- Ultimate Day (+50p): 6 activities | Balanced Beast (+25p): 4 activities
+- Morning Warrior (+15p), Code Athlete (+18p), Social Fitness (+18p)
+- View all combos in quest modal. Auto-detected after submission.
 
 ---
 
