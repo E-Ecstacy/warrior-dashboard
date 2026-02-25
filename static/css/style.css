@@ -1805,3 +1805,41 @@ textarea {
 .close-programming:hover {
     color: var(--intellect-color);
 }
+
+/* Date Selector in Quest Form */
+.date-selector {
+    background: rgba(0, 217, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 2px solid var(--accent-cyan);
+    margin-bottom: 2rem;
+}
+
+.date-selector label {
+    display: block;
+    color: var(--accent-cyan);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.date-selector input[type="date"] {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.date-selector input[type="date"]:hover {
+    border-color: var(--accent-cyan);
+}
+
+.date-selector input[type="date"]:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+}

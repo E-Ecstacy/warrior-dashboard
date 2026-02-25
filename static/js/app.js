@@ -14,7 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
     // Open quest modal
     document.getElementById('open-quest-modal').addEventListener('click', () => {
-        document.getElementById('quest-modal').style.display = 'block';
+        const modal = document.getElementById('quest-modal');
+        const dateInput = document.getElementById('log-date');
+        
+        // Set to today by default
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        dateInput.max = today; // Prevent future dates
+        
+        modal.style.display = 'block';
     });
     
     // Close quest modal
@@ -414,6 +422,7 @@ async function handleQuestSubmit(e) {
     
     // Build quest entry object
     const entry = {
+        log_date: formData.get('log_date'), // Add selected date
         tier1_complete: false,
         tier2: {},
         tier3: {},

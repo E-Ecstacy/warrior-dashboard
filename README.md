@@ -64,13 +64,16 @@
 
 - **💰 Budget Tracker** — Track income/expenses, earn points for financial discipline (+2p per transaction)
 - **💪 Workout Sessions** — Log workouts with exercises, duration, and notes (25-40p per session)
+- **🐍 Python Skill Tree** — Track coding sessions with XP/leveling (Practice, Tutorial, Project, Problem Solving). Level 1→50 with milestone ranks
 - **📝 Notes & Planning** — Daily notes, tomorrow's plans, goals, ideas (2-5p each)
 - **🏋️ Personal Records** — Track workout PRs, automatic volume calculation, progressive point rewards
 - **🎲 Daily Challenges** — Random challenge each day (No Caffeine, Ice Bath, Silent Workout, etc.)
 - **⚡ Combo System** — 15 auto-detected activity chains award bonus points (Ultimate Day: +50p, Balanced Beast: +25p, Morning Warrior: +15p). No double counting, multiple combos per day, visible in quest modal
+- **📅 Past Date Logging** — Forgot to log yesterday? Select any past date and backfill. Future dates blocked
 - **💀 Nemesis Mode** (Optional) — Choose 3 non-negotiables, break one = ZERO points that day
 - **👻 Ghost Data** — Compare today vs last week, track your best week ever
 - **📊 Analytics Dashboard** — Total days, averages, best/worst days, activity breakdown, weekly trends
+- **🔄 Multiple Logs Per Day** — Log throughout the day, automatically merges into one entry
 
 ### 🎨 User Experience
 
@@ -79,6 +82,7 @@
 - **Real-Time Updates** — Instant point calculations and stat updates
 - **Smooth Animations** — Progress bars, achievement popups, combo indicators
 - **Collapsible Sections** — Clean, organized quest logging
+- **Flexible Logging** — Log for today or any past date you missed (future dates blocked)
 - **Multiple Logs Per Day** — Log activities throughout the day, automatically merges into one entry
 
 ### 🔧 Technical
@@ -165,8 +169,9 @@ python app.py
 
 **Throughout the Day:**
 - Log activities as you complete them
-- Track workouts, budget transactions
+- Track workouts, budget transactions, Python sessions
 - Take notes and set goals
+- **Forgot yesterday?** Change the date and backfill
 
 **Evening (9 PM):**
 - Final activity log
@@ -174,6 +179,9 @@ python app.py
 - Check weekly progress
 - Plan tomorrow
 
+**Missed a Day?**
+- No problem! Select the date you missed and log retroactively
+- All combos and points calculated correctly for that date
 ### Point System Explained
 
 **Tier 1 (Foundation)** — 4 required activities (sleep, movement, focus, clean day)
@@ -446,14 +454,16 @@ This started as a personal project, but I'm open to contributions!
 - [x] Skill tree
 - [x] Budget tracker
 - [x] Workout sessions
+- [x] Python Skill Tree (track coding with XP/levels)
 - [x] Personal records
 - [x] Notes & planning
 - [x] Daily challenges
-- [x] Combo system
+- [x] Combo system (15 activity chains)
 - [x] Nemesis mode
 - [x] Ghost data
 - [x] Analytics dashboard
 - [x] Multiple logs per day
+- [x] Past date logging (backfill missed days)
 - [x] Dark cyberpunk UI
 - [x] Docker support
 - [x] SQLite database option

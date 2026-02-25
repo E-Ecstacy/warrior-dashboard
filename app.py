@@ -429,8 +429,20 @@ def daily_log():
     
     if request.method == 'POST':
         entry = request.json
-        today = datetime.now().strftime('%Y-%m-%d')
-        entry['date'] = today
+        
+        # Get date from entry or default to today
+        log_date = entry.get('log_date')
+        if log_date:
+            # Validate it's not in the future
+            log_datetime = datetime.strptime(log_date, '%Y-%m-%d')
+            today_datetime = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            
+            if log_datetime > today_datetime:
+                return jsonify({'success': False, 'error': 'Cannot log future dates'}), 400
+            
+            entry['date'] = log_date
+        else:
+            entry['date'] = datetime.now().strftime('%Y-%m-%d')
         
         # Calculate total points
         total_points = 0
@@ -708,13 +720,13 @@ def daily_log():
             if is_done and activity_name != 'deep_work_quality':  # Skip quality indicator
                 activities_completed.append(activity_name)
         
-        # Check combos across ALL logs today (merge with previous logs if exists)
-        today = datetime.now().strftime('%Y-%m-%d')
-        existing_entry = next((e for e in data['daily_log'] if e.get('date') == today), None)
+        # Check combos across ALL logs for this date (merge with previous logs if exists)
+        log_date = entry['date']
+        existing_entry_for_combo = next((e for e in data['daily_log'] if e.get('date') == log_date), None)
         
-        if existing_entry:
-            # Merge activities from previous logs today
-            existing_tier2 = existing_entry.get('tier2', {})
+        if existing_entry_for_combo:
+            # Merge activities from previous logs for this date
+            existing_tier2 = existing_entry_for_combo.get('tier2', {})
             for activity_name, is_done in existing_tier2.items():
                 if is_done and activity_name not in activities_completed and activity_name != 'deep_work_quality':
                     activities_completed.append(activity_name)
@@ -744,13 +756,13 @@ def daily_log():
         # Check achievements
         new_achievements = check_achievements(data, entry)
         for achievement in new_achievements:
-            achievement['date_earned'] = today
+            achievement['date_earned'] = entry['date']
             data['achievements']['earned'].append(achievement)
             data['character']['total_points'] += achievement['points_bonus']
             data['skill_tree']['available_points'] += achievement['points_bonus']
         
-        # MERGE OR ADD ENTRY - Check if entry for today already exists
-        existing_entry = next((e for e in data['daily_log'] if e.get('date') == today), None)
+        # MERGE OR ADD ENTRY - Check if entry for this date already exists
+        existing_entry = next((e for e in data['daily_log'] if e.get('date') == entry['date']), None)
         
         if existing_entry:
             # MERGE: Combine activities from both entries
