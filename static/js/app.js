@@ -1455,3 +1455,125 @@ Level ${result.language_data.level}`;
         console.error("Error:", error);
     }
 }
+
+// Navigation System
+function setupNavigation() {
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const sections = document.querySelectorAll('.content-section');
+    
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetSection = btn.dataset.section;
+            
+            // Remove active class from all buttons and sections
+            navBtns.forEach(b => b.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+            
+            // Add active class to clicked button and target section
+            btn.classList.add('active');
+            document.getElementById(`${targetSection}-section`).classList.add('active');
+            
+            // Load section-specific content
+            if (targetSection === 'logs') {
+                loadDailyLogs();
+            }
+        });
+    });
+}
+
+// Call setup on page load
+setupNavigation();
+
+// Load Daily Logs
+async function loadDailyLogs() {
+    try {
+        const response = await fetch('/api/daily-log');
+        const logs = await response.json();
+        
+        const container = document.getElementById('logs-container');
+        
+        if (logs.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No logs yet. Start logging!</p>';
+            return;
+        }
+        
+        container.innerHTML = logs.slice(-30).reverse().map(log => `
+            <div class="log-card">
+                <div class="log-header">
+                    <strong>${log.date}</strong>
+                    <span class="log-points">${log.total_points}p</span>
+                </div>
+                <div class="log-details">
+                    ${log.tier1_complete ? '<span class="badge">✅ Foundation</span>' : ''}
+                    ${log.combos_activated && log.combos_activated.length > 0 ? 
+                        `<span class="badge combo">⚡ ${log.combos_activated.length} Combos</span>` : ''}
+                    ${log.combo_bonus ? `<span class="badge bonus">+${log.combo_bonus}p</span>` : ''}
+                </div>
+                ${log.notes ? `<div class="log-notes">${log.notes}</div>` : ''}
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading logs:', error);
+    }
+}
+
+// Add CSS for log cards
+const logStyles = document.createElement('style');
+logStyles.textContent = `
+.log-card {
+    background: var(--bg-card);
+    padding: 1rem;
+    margin: 0.8rem 0;
+    border-radius: 10px;
+    border-left: 4px solid var(--accent-cyan);
+}
+
+.log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.log-points {
+    color: var(--accent-gold);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.log-details {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.badge {
+    padding: 0.3rem 0.8rem;
+    background: rgba(0, 217, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--accent-cyan);
+}
+
+.badge.combo {
+    background: rgba(255, 214, 10, 0.2);
+    color: var(--accent-gold);
+}
+
+.badge.bonus {
+    background: rgba(255, 0, 110, 0.2);
+    color: var(--accent-pink);
+}
+
+.log-notes {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+`;
+document.head.appendChild(logStyles);
+
+// Call load logs when logs section is opened

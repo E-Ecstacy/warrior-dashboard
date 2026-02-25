@@ -1843,3 +1843,436 @@ textarea {
     border-color: var(--accent-cyan);
     box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
 }
+
+/* ==============================================
+   ADVANCED CSS - PROFESSIONAL TOUCHES
+   ============================================== */
+
+/* Subtle texture overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 217, 255, 0.03) 2px, rgba(0, 217, 255, 0.03) 4px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Glassmorphism cards */
+.stat-card, .streak-card, .achievement-card {
+    backdrop-filter: blur(10px);
+    background: rgba(14, 20, 39, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animated gradient borders */
+@keyframes borderGlow {
+    0%, 100% { border-color: var(--accent-cyan); }
+    50% { border-color: var(--accent-pink); }
+}
+
+.character-stats:hover {
+    animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* Smooth stat bar fills with easing */
+.stat-bar-fill {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover state with scale and shadow */
+.stat-card:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 217, 255, 0.2);
+}
+
+/* Staggered fade-in for activity items */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.activity-group label {
+    animation: fadeInUp 0.3s ease-out backwards;
+}
+
+.activity-group label:nth-child(1) { animation-delay: 0.05s; }
+.activity-group label:nth-child(2) { animation-delay: 0.1s; }
+.activity-group label:nth-child(3) { animation-delay: 0.15s; }
+.activity-group label:nth-child(4) { animation-delay: 0.2s; }
+.activity-group label:nth-child(5) { animation-delay: 0.25s; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent-cyan), var(--accent-pink));
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--accent-pink), var(--accent-gold));
+}
+
+/* Checkbox custom styling */
+input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+    border-color: var(--accent-cyan);
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Subtle parallax effect on scroll */
+@media (prefers-reduced-motion: no-preference) {
+    .header-section {
+        transform: translateZ(0);
+        will-change: transform;
+    }
+}
+
+/* Advanced button states */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Combo card shine effect */
+@keyframes shine {
+    0% { background-position: -100%; }
+    100% { background-position: 200%; }
+}
+
+.combo-item.ultimate {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 0, 110, 0.1) 0%,
+        rgba(255, 214, 10, 0.2) 50%,
+        rgba(255, 0, 110, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    animation: shine 3s linear infinite;
+}
+
+/* Skill tree node connections */
+.skill-tree-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Progress bar shimmer */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.skill-progress-fill {
+    background: linear-gradient(
+        90deg,
+        var(--intellect-color) 0%,
+        var(--accent-cyan) 50%,
+        var(--intellect-color) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+/* Modal entrance animation */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.modal-content {
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Streak fire effect */
+.streak-card[data-streak="7"]::after,
+.streak-card[data-streak="30"]::after {
+    content: '🔥';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 2rem;
+    animation: flicker 1.5s ease-in-out infinite;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Advanced form focus states */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 
+        0 0 0 3px rgba(0, 217, 255, 0.1),
+        0 0 15px rgba(0, 217, 255, 0.2);
+}
+
+/* Clipped corner effect on cards */
+.programming-skill-card {
+    clip-path: polygon(
+        0 0,
+        calc(100% - 20px) 0,
+        100% 20px,
+        100% 100%,
+        20px 100%,
+        0 calc(100% - 20px)
+    );
+}
+
+/* Grid overlay on analytics */
+.analytics-section {
+    background-image:
+        linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* Hover lift effect with shadow */
+.workout-card:hover,
+.session-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 217, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gradient text effect */
+h1, h2 {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Subtle pulse on active elements */
+@keyframes subtlePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.btn-primary:active {
+    animation: subtlePulse 0.3s ease;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .stat-card:hover {
+        transform: none; /* Disable hover effects on mobile */
+    }
+    
+    .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* Dark mode depth with multiple shadows */
+.card-container {
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.5),
+        0 10px 20px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Neon glow on important elements */
+.level-display {
+    text-shadow: 
+        0 0 10px var(--accent-cyan),
+        0 0 20px var(--accent-cyan),
+        0 0 30px var(--accent-cyan);
+}
+
+/* Smooth page transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--accent-cyan);
+    outline-offset: 2px;
+}
+
+/* ==============================================
+   NAVIGATION MENU SYSTEM
+   ============================================== */
+
+/* Main Navigation */
+.main-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin: 2rem 0;
+    padding: 0.5rem;
+    background: rgba(14, 20, 39, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-x: auto;
+}
+
+.nav-btn {
+    padding: 0.8rem 1.5rem;
+    background: transparent;
+    border: 2px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-btn:hover {
+    color: var(--accent-cyan);
+    background: rgba(0, 217, 255, 0.1);
+}
+
+.nav-btn.active {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+    color: white;
+    border-color: var(--accent-cyan);
+}
+
+/* Content Sections */
+.content-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.content-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Compact Layout Adjustments */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+section {
+    margin-bottom: 1.5rem;
+}
+
+/* Remove excess spacing */
+h2 {
+    margin: 1rem 0 0.8rem 0;
+}
+
+.stat-card, .card-container {
+    margin-bottom: 1rem;
+}
+
+/* Mobile nav scroll */
+@media (max-width: 768px) {
+    .main-nav {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .main-nav::-webkit-scrollbar {
+        height: 4px;
+    }
+}
+
+/* Cleaner sections - remove redundant borders */
+.character-overview,
+.streaks-section,
+.quest-section {
+    border: none;
+    padding: 0;
+}

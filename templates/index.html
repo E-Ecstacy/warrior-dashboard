@@ -14,6 +14,17 @@
             <p class="tagline">"This isn't a schedule. This is your character arc."</p>
         </header>
 
+        <!-- Navigation Menu -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="overview">📊 Overview</button>
+            <button class="nav-btn" data-section="activities">⚔️ Activities</button>
+            <button class="nav-btn" data-section="skills">🌳 Skills</button>
+            <button class="nav-btn" data-section="logs">📜 Logs</button>
+            <button class="nav-btn" data-section="analytics">📈 Analytics</button>
+        </nav>
+
+        <!-- Overview Section -->
+        <div id="overview-section" class="content-section active">
         <!-- Character Overview -->
         <section class="character-overview">
             <div class="stat-card main-stats">
@@ -108,7 +119,11 @@
                 </div>
             </div>
         </section>
+        </div>
+        <!-- End Overview Section -->
 
+        <!-- Activities Section -->
+        <div id="activities-section" class="content-section">
         <!-- Active Streaks -->
         <section class="streaks-section">
             <h2>🔥 ACTIVE STREAKS</h2>
@@ -161,14 +176,6 @@
             </div>
         </section>
 
-        <!-- Analytics Dashboard -->
-        <section class="analytics-section">
-            <h2>📊 ANALYTICS</h2>
-            <div class="analytics-container" id="analytics-container">
-                <!-- Analytics will be loaded here -->
-            </div>
-        </section>
-
         <!-- Achievements -->
         <section class="achievements-section">
             <h2>🏆 ACHIEVEMENTS</h2>
@@ -186,7 +193,11 @@
                 <!-- PRs will be loaded here -->
             </div>
         </section>
+        </div>
+        <!-- End Activities Section -->
 
+        <!-- Skills Section -->
+        <div id="skills-section" class="content-section">
         <!-- Notes & Planning -->
         <section class="notes-section">
             <h2>📝 NOTES & PLANNING</h2>
@@ -259,6 +270,31 @@
                 <!-- Skills will be loaded here -->
             </div>
         </section>
+        </div>
+        <!-- End Skills Section -->
+
+        <!-- Logs Section -->
+        <div id="logs-section" class="content-section">
+            <h2>📜 DAILY LOGS</h2>
+            <div id="logs-container">
+                <!-- Logs will be loaded here -->
+            </div>
+        </div>
+        <!-- End Logs Section -->
+
+        <!-- Analytics Section -->
+        <div id="analytics-section" class="content-section">
+            <!-- Analytics content already exists, will move it here -->
+        <!-- Analytics Dashboard -->
+        <section class="analytics-section">
+            <h2>📈 ANALYTICS</h2>
+            <div id="analytics-container">
+                <!-- Analytics will be loaded here -->
+            </div>
+        </section>
+        </div>
+        <!-- End Analytics Section -->
+
     </div>
 
     <!-- Quest Modal -->
