@@ -1,23 +1,23 @@
 /* Warrior Dashboard - Dark Cyberpunk Theme */
 
 :root {
-    --bg-primary: #0a0e27;
-    --bg-secondary: #1a1f3a;
-    --bg-card: #252d48;
-    --accent-cyan: #00d9ff;
-    --accent-pink: #ff006e;
-    --accent-green: #00ff87;
-    --accent-gold: #ffd60a;
-    --accent-red: #ff3864;
+    --bg-primary: #040615;
+    --bg-secondary: #111933;
+    --bg-card: #1b2750;
+    --accent-cyan: #00eaff;
+    --accent-pink: #ff1f8f;
+    --accent-green: #17ff9f;
+    --accent-gold: #ffe342;
+    --accent-red: #ff2a5d;
     --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --text-dim: #6b7280;
+    --text-secondary: #d4dcff;
+    --text-dim: #8e9ac9;
     
-    --strength-color: #ff3864;
-    --intellect-color: #00d9ff;
-    --discipline-color: #a855f7;
-    --energy-color: #ffd60a;
-    --influence-color: #00ff87;
+    --strength-color: #ff416d;
+    --intellect-color: #00eaff;
+    --discipline-color: #b266ff;
+    --energy-color: #ffe342;
+    --influence-color: #17ff9f;
 }
 
 * {
@@ -28,10 +28,20 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1438 100%);
+    background:
+        radial-gradient(circle at 10% 18%, rgba(0, 234, 255, 0.2) 0 130px, transparent 130px),
+        radial-gradient(circle at 24% 20%, rgba(255, 255, 255, 0.2) 1.5px, transparent 1.5px) 0 0 / 14px 14px,
+        radial-gradient(circle at 85% 28%, rgba(255, 31, 143, 0.18) 0 150px, transparent 150px),
+        radial-gradient(circle at 87% 30%, rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px) 0 0 / 14px 14px,
+        radial-gradient(circle at 18% 82%, rgba(255, 227, 66, 0.2) 0 140px, transparent 140px),
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.2) 1.5px, transparent 1.5px) 0 0 / 14px 14px,
+        radial-gradient(circle at 78% 80%, rgba(23, 255, 159, 0.16) 0 120px, transparent 120px),
+        radial-gradient(circle at 76% 82%, rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px) 0 0 / 14px 14px,
+        linear-gradient(135deg, var(--bg-primary) 0%, #120524 52%, #041335 100%);
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
+    background-attachment: fixed;
 }
 
 .container {
@@ -117,7 +127,7 @@ body {
 }
 
 .stat-card {
-    background: var(--bg-card);
+    background: linear-gradient(145deg, rgba(27, 39, 80, 0.94), rgba(17, 25, 51, 0.92));
     padding: 1.5rem;
     border-radius: 15px;
     border: 2px solid;
@@ -207,7 +217,7 @@ body {
 }
 
 .streak-card {
-    background: var(--bg-card);
+    background: linear-gradient(145deg, rgba(27, 39, 80, 0.92), rgba(17, 25, 51, 0.9));
     padding: 1.5rem;
     border-radius: 12px;
     border: 2px solid var(--accent-gold);
@@ -255,7 +265,7 @@ body {
 }
 
 .today-summary {
-    background: var(--bg-card);
+    background: linear-gradient(145deg, rgba(27, 39, 80, 0.92), rgba(17, 25, 51, 0.88));
     padding: 2rem;
     border-radius: 15px;
     border: 2px solid var(--accent-green);
