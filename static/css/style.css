@@ -1,23 +1,23 @@
-/* Warrior Dashboard - Dark Cyberpunk Theme */
+/* Warrior Dashboard - Minimalist Theme */
 
 :root {
-    --bg-primary: #0a0e27;
-    --bg-secondary: #1a1f3a;
-    --bg-card: #252d48;
-    --accent-cyan: #00d9ff;
-    --accent-pink: #ff006e;
-    --accent-green: #00ff87;
-    --accent-gold: #ffd60a;
-    --accent-red: #ff3864;
-    --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --text-dim: #6b7280;
+    /* Saturated Color Palette */
+    --bg-primary: #1a1d23;      /* Darker for contrast */
+    --bg-secondary: #2d3340;    /* Lighter secondary */
+    --bg-card: #2d3340;         /* Card background */
+    --accent-cyan: #00e5ff;     /* More saturated teal/cyan */
+    --accent-secondary: #0099a3; /* Darker teal for hover */
+    --text-primary: #ffffff;     /* Pure white for contrast */
+    --text-secondary: #a8b2c1;  /* Lighter gray */
+    --text-dim: #6b7280;        /* Dim text */
+    --border-color: #3a4050;    /* Visible borders */
     
-    --strength-color: #ff3864;
-    --intellect-color: #00d9ff;
-    --discipline-color: #a855f7;
-    --energy-color: #ffd60a;
-    --influence-color: #00ff87;
+    /* Stat Colors - saturated and contrasting */
+    --strength-color: #ff5370;  /* Brighter red */
+    --intellect-color: #00e5ff; /* Bright cyan */
+    --discipline-color: #b77af7; /* Brighter purple */
+    --energy-color: #ffeb3b;    /* Bright yellow */
+    --influence-color: #00ff88; /* Bright green */
 }
 
 * {
@@ -28,10 +28,66 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1438 100%);
+    background: var(--bg-primary);
+    background-image: radial-gradient(circle, rgba(238, 238, 238, 0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
+    position: relative;
+}
+
+/* Halftone Dot Circle Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle, rgba(0, 229, 255, 0.4) 1.5px, transparent 1.5px),
+        radial-gradient(circle, rgba(0, 229, 255, 0.3) 2px, transparent 2px),
+        radial-gradient(circle, rgba(0, 229, 255, 0.25) 2.5px, transparent 2.5px),
+        radial-gradient(circle, rgba(0, 229, 255, 0.2) 3px, transparent 3px),
+        radial-gradient(circle, rgba(0, 229, 255, 0.15) 3.5px, transparent 3.5px),
+        radial-gradient(circle, rgba(0, 229, 255, 0.1) 4px, transparent 4px);
+    background-size: 
+        8px 8px,
+        12px 12px,
+        16px 16px,
+        20px 20px,
+        24px 24px,
+        28px 28px;
+    background-position:
+        25% 25%,
+        75% 25%,
+        50% 50%,
+        25% 75%,
+        75% 75%,
+        50% 25%;
+    mask-image: 
+        radial-gradient(ellipse 500px 500px at 25% 25%, black 0%, transparent 70%),
+        radial-gradient(ellipse 450px 450px at 75% 25%, black 0%, transparent 70%),
+        radial-gradient(ellipse 480px 480px at 50% 50%, black 0%, transparent 70%),
+        radial-gradient(ellipse 420px 420px at 25% 75%, black 0%, transparent 70%),
+        radial-gradient(ellipse 460px 460px at 75% 75%, black 0%, transparent 70%);
+    mask-composite: add;
+    -webkit-mask-image: 
+        radial-gradient(ellipse 500px 500px at 25% 25%, black 0%, transparent 70%),
+        radial-gradient(ellipse 450px 450px at 75% 25%, black 0%, transparent 70%),
+        radial-gradient(ellipse 480px 480px at 50% 50%, black 0%, transparent 70%),
+        radial-gradient(ellipse 420px 420px at 25% 75%, black 0%, transparent 70%),
+        radial-gradient(ellipse 460px 460px at 75% 75%, black 0%, transparent 70%);
+    -webkit-mask-composite: source-over;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+}
+
+/* Remove secondary dot overlay */
+body::after {
+    display: none;
 }
 
 .container {
@@ -45,19 +101,25 @@ body {
     text-align: center;
     margin-bottom: 3rem;
     padding: 2rem;
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+    background: var(--bg-card);
     border-radius: 20px;
     border: 2px solid var(--accent-cyan);
-    box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+    box-shadow: none;
 }
 
 .dashboard-header h1 {
     font-size: 3rem;
-    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: var(--text-primary);
     margin-bottom: 0.5rem;
-    text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+    text-shadow: 
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000,
+        0 0 20px rgba(0, 229, 255, 0.3);
 }
 
 .tagline {
@@ -2030,20 +2092,10 @@ input[type="checkbox"]:checked::after {
 }
 
 /* Progress bar shimmer */
-@keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
-}
 
 .skill-progress-fill {
-    background: linear-gradient(
-        90deg,
-        var(--intellect-color) 0%,
-        var(--accent-cyan) 50%,
-        var(--intellect-color) 100%
-    );
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
+    background: var(--accent-cyan);
+    transition: width 0.6s ease;
 }
 
 /* Modal entrance animation */
@@ -2276,3 +2328,384 @@ h2 {
     border: none;
     padding: 0;
 }
+
+/* ==============================================
+   UPDATED COLOR SCHEME OVERRIDES
+   ============================================== */
+
+/* Remove gradient overlays */
+body::before {
+    display: none;
+}
+
+/* Clean card styling */
+.stat-card, .streak-card, .achievement-card {
+    backdrop-filter: none;
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 173, 181, 0.2);
+}
+
+/* Simpler gradients */
+h1, h2 {
+    background: none;
+    -webkit-text-fill-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+/* Clean button gradients */
+.btn-primary {
+    background: var(--accent-cyan);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #009199;
+}
+
+/* Nav button active state - clean */
+.nav-btn.active {
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+    border-color: var(--accent-cyan);
+}
+
+/* Progress bars - solid color */
+.stat-bar-fill, .skill-progress-fill {
+    background: var(--accent-cyan);
+    animation: none;
+}
+
+/* Remove shine effects */
+.combo-item.ultimate {
+    background: rgba(0, 173, 181, 0.1);
+    animation: none;
+}
+
+/* Clean scrollbar */
+::-webkit-scrollbar-thumb {
+    background: var(--accent-cyan);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #009199;
+}
+
+/* Checkbox - clean teal */
+input[type="checkbox"]:checked {
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
+
+/* Neon glow - remove excessive glow */
+.level-display {
+    text-shadow: none;
+}
+
+/* ==============================================
+   MINIMALIST DESIGN OVERRIDES
+   ============================================== */
+
+/* Ensure content is above background */
+.container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Minimalist cards - clean borders */
+.stat-card, .streak-card, .achievement-card, .card-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    backdrop-filter: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Clean stat colors */
+.stat-card[data-stat="strength"] {
+    border-left: 4px solid var(--strength-color);
+}
+
+.stat-card[data-stat="intellect"] {
+    border-left: 4px solid var(--intellect-color);
+}
+
+.stat-card[data-stat="discipline"] {
+    border-left: 4px solid var(--discipline-color);
+}
+
+.stat-card[data-stat="energy"] {
+    border-left: 4px solid var(--energy-color);
+}
+
+.stat-card[data-stat="influence"] {
+    border-left: 4px solid var(--influence-color);
+}
+
+/* Headers - minimalist */
+h1, h2, h3 {
+    background: none;
+    color: var(--text-primary);
+    -webkit-text-fill-color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Accent headers */
+h1 {
+    color: var(--accent-cyan);
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Clean buttons */
+.btn {
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+}
+
+.btn-primary:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+}
+
+.btn::before {
+    display: none; /* Remove ripple effect for minimalism */
+}
+
+/* Navigation - minimalist */
+.nav-btn {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.nav-btn.active {
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+}
+
+/* Progress bars - clean */
+.stat-bar, .skill-progress-bar {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    background: var(--accent-cyan);
+    transition: width 0.6s ease;
+}
+
+/* Individual stat colors for progress */
+.stat-card[data-stat="strength"] .stat-bar-fill {
+    background: var(--strength-color);
+}
+
+.stat-card[data-stat="intellect"] .stat-bar-fill {
+    background: var(--intellect-color);
+}
+
+.stat-card[data-stat="discipline"] .stat-bar-fill {
+    background: var(--discipline-color);
+}
+
+.stat-card[data-stat="energy"] .stat-bar-fill {
+    background: var(--energy-color);
+}
+
+.stat-card[data-stat="influence"] .stat-bar-fill {
+    background: var(--influence-color);
+}
+
+/* Checkboxes - minimalist */
+input[type="checkbox"] {
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
+
+/* Forms - clean */
+input, select, textarea {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 0.8rem;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+}
+
+/* Scrollbar - minimalist */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent-cyan);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-secondary);
+}
+
+/* Remove excessive animations */
+
+.skill-progress-fill {
+    background: var(--accent-cyan);
+    animation: none;
+}
+
+/* Clean combo cards */
+.combo-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--accent-cyan);
+}
+
+.combo-item.ultimate {
+    background: rgba(0, 229, 255, 0.1);
+    border-left-color: var(--accent-cyan);
+    animation: none;
+}
+
+/* Modal - minimalist */
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+/* Remove glow effects */
+.level-display, .points-display {
+    text-shadow: none;
+}
+
+/* Badge colors */
+.badge {
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+}
+
+/* Achievement cards */
+.achievement-card {
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.achievement-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+}
+
+/* Streak cards */
+.streak-card {
+    border-left: 3px solid var(--accent-cyan);
+}
+
+/* Clean shadows */
+.card-container {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-container:hover {
+    box-shadow: 0 4px 16px rgba(0, 229, 255, 0.15);
+}
+
+/* ==============================================
+   ENHANCED SATURATION & EFFECTS
+   ============================================== */
+
+/* Brighter borders with glow */
+.stat-card, .card-container {
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 229, 255, 0.05);
+}
+
+.stat-card:hover, .card-container:hover {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 30px rgba(0, 229, 255, 0.15);
+}
+
+/* Progress bars with subtle glow */
+.stat-bar-fill, .skill-progress-fill {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+}
+
+/* Nav active with glow */
+.nav-btn.active {
+    background: var(--accent-cyan);
+    color: var(--bg-primary);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+/* Button glow effect */
+.btn-primary {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+}
+
+/* Level display glow */
+.level-display {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+    font-weight: bold;
+}
+
+/* Achievement glow on hover */
+.achievement-card:hover {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.2);
+}
+
+/* Streak fire with better contrast */
+.streak-card[data-streak="7"]::after,
+.streak-card[data-streak="30"]::after {
+    filter: drop-shadow(0 0 8px rgba(255, 235, 59, 0.8));
+}
+
+/* Brighter text on hover */
+.stat-card:hover h3,
+.card-container:hover h3 {
+    color: var(--accent-cyan);
+}
+
+/* Combo badges more vibrant */
+.combo-item strong {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+/* Analytics chart area glow */
+.analytics-section {
+    background: var(--bg-card);
+    box-shadow: inset 0 0 50px rgba(0, 229, 255, 0.03);
+}
+
+
