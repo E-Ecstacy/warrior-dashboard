@@ -63,15 +63,26 @@ def calculate_stat_xp(tier2, tier3):
     return stat_xp
 
 def update_stats(stats, stat_xp):
-    """Update character stats with earned XP"""
+    """Update character stats with earned XP - bulletproof version"""
+    if not stats or not isinstance(stats, dict):
+        stats = {}
+
     for stat_name, xp in stat_xp.items():
-        stat = stats[stat_name]
+        if xp <= 0:
+            continue  # Skip stats that earned nothing
+
+        # Safe fallback if key is missing
+        stat = stats.get(stat_name, {'level': 1, 'xp': 0, 'xp_to_next': 100})
+        stats[stat_name] = stat  # Ensure it's written back
+
         stat['xp'] += xp
-        
+
         # Level up if needed
         while stat['xp'] >= stat['xp_to_next']:
             stat['xp'] -= stat['xp_to_next']
             stat['level'] += 1
             stat['xp_to_next'] = int(100 * (1.2 ** (stat['level'] - 1)))
-    
+
+        print(f"  📊 {stat_name}: +{xp}xp → Lv{stat['level']} ({stat['xp']}/{stat['xp_to_next']})")
+
     return stats
