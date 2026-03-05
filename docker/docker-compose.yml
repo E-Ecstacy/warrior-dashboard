@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  warrior:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - warrior_db:/app/instance
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=change-me-in-production
+    restart: unless-stopped
+
+volumes:
+  warrior_db:
