@@ -1,0 +1,63 @@
+<div id="tab-budget" class="tab-pane">
+    <div class="budget-summary">
+        <div class="budget-box">
+            <div class="amount balance-color">{{ budget.balance | round(2) }}</div>
+            <div style="font-size:0.8rem;color:#a8b2c1;">BALANCE</div>
+        </div>
+        <div class="budget-box">
+            <div class="amount income-color">+{{ budget_summary.monthly_income | round(2) }}</div>
+            <div style="font-size:0.8rem;color:#a8b2c1;">THIS MONTH IN</div>
+        </div>
+        <div class="budget-box">
+            <div class="amount expense-color">-{{ budget_summary.monthly_expenses | round(2) }}</div>
+            <div style="font-size:0.8rem;color:#a8b2c1;">THIS MONTH OUT</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem;">
+        <div class="section-title">ADD TRANSACTION (+2p)</div>
+        <form method="POST" action="{{ url_for('main.add_transaction') }}" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+                <label class="form-label">Type</label>
+                <select name="type" class="form-input">
+                    <option value="income">💚 Income</option>
+                    <option value="expense">🔴 Expense</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">Amount</label>
+                <input type="number" name="amount" step="0.01" min="0.01" placeholder="0.00" class="form-input">
+            </div>
+            <div>
+                <label class="form-label">Category</label>
+                <select name="category" class="form-input">
+                    <option>Food</option><option>Transport</option><option>Entertainment</option>
+                    <option>Fitness</option><option>Learning</option><option>Bills</option>
+                    <option>Shopping</option><option>Salary</option><option>Freelance</option><option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">Description</label>
+                <input type="text" name="description" placeholder="Optional note" class="form-input">
+            </div>
+            <div style="grid-column:span 2;">
+                <button type="submit" class="btn btn-primary">💰 Add Transaction</button>
+            </div>
+        </form>
+    </div>
+
+    {% if budget_summary.recent_transactions %}
+    <div class="card">
+        <div class="section-title">RECENT TRANSACTIONS</div>
+        {% for t in budget_summary.recent_transactions|reverse %}
+        <div class="transaction-item">
+            <span>{{ t.category }} — {{ t.description or '—' }}</span>
+            <span class="{{ 'income-color' if t.type == 'income' else 'expense-color' }}">
+                {{ '+' if t.type == 'income' else '-' }}{{ t.amount }}
+            </span>
+            <span style="color:#a8b2c1;">{{ t.date }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

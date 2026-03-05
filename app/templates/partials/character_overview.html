@@ -1,0 +1,37 @@
+<section class="character-overview card" style="margin-bottom:1.5rem;">
+    <div class="main-stats">
+        <div class="info-item">
+            <span class="label">LEVEL</span>
+            <span class="value">{{ character.level }}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">TOTAL POINTS</span>
+            <span class="value">{{ character.total_points }}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">THIS WEEK</span>
+            <span class="value">{{ character.current_week_points }} / 600</span>
+        </div>
+    </div>
+    <div class="grid-5">
+        {% for stat_name in ['strength','intellect','discipline','energy','influence'] %}
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-icon">
+                    {% if stat_name == 'strength' %}⚔️
+                    {% elif stat_name == 'intellect' %}🧠
+                    {% elif stat_name == 'discipline' %}🛡️
+                    {% elif stat_name == 'energy' %}⚡
+                    {% else %}👑{% endif %}
+                </span>
+                <h3>{{ stat_name.upper() }}</h3>
+            </div>
+            <div class="stat-level">Lv. {{ stats[stat_name]['level'] }}</div>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" style="width:{{ stats[stat_name]['progress'] }}%"></div>
+            </div>
+            <div class="stat-xp">{{ stats[stat_name]['xp'] }} / {{ stats[stat_name]['xp_to_next'] }} XP</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>

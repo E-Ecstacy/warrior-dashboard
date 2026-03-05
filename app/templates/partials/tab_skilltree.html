@@ -1,0 +1,39 @@
+<div id="tab-skilltree" class="tab-pane">
+    <div class="card" style="margin-bottom:1rem;">
+        <p>Available to spend: <strong style="color:#ffd700;font-size:1.3rem;">{{ character.total_points }} pts</strong></p>
+    </div>
+
+    {% if skill_tree_unlocked %}
+    <div class="section-title" style="margin-bottom:0.75rem;">✅ UNLOCKED REWARDS</div>
+    {% for skill in skill_tree_unlocked %}
+    <div class="skill-item unlocked">
+        <div>
+            <strong>{{ skill.name }}</strong>
+            <div style="font-size:0.8rem;color:#a8b2c1;">Unlocked {{ skill.get('date_unlocked','') }}</div>
+        </div>
+        <span style="color:#00c853;">✓ Earned</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="section-title" style="margin:1rem 0 0.75rem;">🔒 AVAILABLE REWARDS</div>
+    {% for skill in skill_tree_locked %}
+    <div class="skill-item">
+        <div>
+            <strong>{{ skill.name }}</strong>
+            <div style="font-size:0.8rem;color:#a8b2c1;">{{ skill.category.upper() }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+            <span class="skill-cost">{{ skill.cost }}p</span>
+            {% if character.total_points >= skill.cost %}
+            <form method="POST" action="{{ url_for('main.unlock_skill') }}">
+                <input type="hidden" name="skill_id" value="{{ skill.id }}">
+                <button type="submit" class="btn btn-primary btn-sm">🔓 Unlock</button>
+            </form>
+            {% else %}
+            <button class="btn btn-secondary btn-sm" disabled>🔒 {{ skill.cost - character.total_points }}p more</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

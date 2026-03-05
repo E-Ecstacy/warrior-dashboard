@@ -1,357 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚔️ Warrior Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        /* Flash messages - no inline Jinja */
-        .flash {
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 8px;
-            border-left: 3px solid;
-        }
-        .flash-success {
-            background: rgba(0, 229, 255, 0.2);
-            border-color: #00e5ff;
-            color: #00e5ff;
-        }
-        .flash-error {
-            background: rgba(255, 83, 112, 0.2);
-            border-color: #ff5370;
-            color: #ff5370;
-        }
+{% extends "base.html" %}
 
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 2rem;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-        .modal.show {
-            display: block;
-        }
-        .modal-content {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #2d3340;
-            padding: 2rem;
-            border-radius: 15px;
-            border: 1px solid #3a4050;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #3a4050;
-            padding-bottom: 1rem;
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 2.5rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .close-btn:hover {
-            color: #ff5370;
-        }
+{% block content %}
 
-        /* Form sections */
-        .form-section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: #1a1d23;
-            border-radius: 12px;
-            border: 2px solid #3a4050;
-        }
-        .form-section h3 {
-            margin-bottom: 1rem;
-        }
-        .activity-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            background: #2d3340;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 0.5rem;
-            transition: background 0.2s;
-        }
-        .activity-item:hover {
-            background: #343947;
-        }
-        .activity-item input {
-            margin-right: 1rem;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        .activity-item span {
-            flex: 1;
-        }
-        .activity-points {
-            color: #00e5ff;
-            font-weight: bold;
-        }
+    <!-- Header -->
+    <header class="dashboard-header">
+        <h1><span class="header-emoji">⚔️</span> WARRIOR DASHBOARD</h1>
+        <p class="tagline">"This isn't a schedule. This is your character arc."</p>
+        <div class="header-actions">
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+        </div>
+    </header>
 
-        /* Input styles */
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            background: #1a1d23;
-            border: 2px solid #3a4050;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #00e5ff;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header class="dashboard-header">
-            <h1>⚔️ WARRIOR DASHBOARD</h1>
-            <p class="tagline">"This isn't a schedule. This is your character arc."</p>
-            <a href="{{ url_for('main.logout') }}" style="color:#00e5ff; text-decoration:none;">Logout</a>
-        </header>
-
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash flash-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- Character Stats -->
-        <section class="character-overview">
-            <div class="stat-card main-stats">
-                <h2>📊 CHARACTER STATS</h2>
-                <div class="character-info">
-                    <div class="info-item">
-                        <span class="label">Level:</span>
-                        <span class="value">{{ character.level }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Total Points:</span>
-                        <span class="value">{{ character.total_points }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">This Week:</span>
-                        <span class="value">{{ character.current_week_points }} / 600</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                {% for stat_name in ['strength', 'intellect', 'discipline', 'energy', 'influence'] %}
-                <div class="stat-card {{ stat_name }}">
-                    <div class="stat-header">
-                        <span class="stat-icon">
-                            {% if stat_name == 'strength' %}⚔️
-                            {% elif stat_name == 'intellect' %}🧠
-                            {% elif stat_name == 'discipline' %}🛡️
-                            {% elif stat_name == 'energy' %}⚡
-                            {% else %}👑{% endif %}
-                        </span>
-                        <h3>{{ stat_name.upper() }}</h3>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-level">Lv. {{ stats[stat_name]['level'] }}</span>
-                        <div class="stat-bar">
-                            <div class="stat-bar-fill" style="width: {{ stats[stat_name]['progress'] }}%"></div>
-                        </div>
-                        <span class="stat-xp">{{ stats[stat_name]['xp'] }} / {{ stats[stat_name]['xp_to_next'] }} XP</span>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <!-- Active Streaks -->
-        {% if active_streaks %}
-        <section class="streaks-section">
-            <h2>🔥 ACTIVE STREAKS</h2>
-            <div class="streaks-grid">
-                {% for streak_name, streak_data in active_streaks.items() %}
-                <div class="streak-card">
-                    <h3>{{ streak_name.replace('_', ' ').title() }}</h3>
-                    <p class="streak-count">{{ streak_data['current'] }} days</p>
-                    <p class="streak-multiplier">×{{ streak_data['multiplier'] }} multiplier</p>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
         {% endif %}
+    {% endwith %}
 
-        <!-- Log Button -->
-        <section class="quest-section">
-            <h2>🎯 TODAY'S QUEST</h2>
-            <button onclick="showModal()" class="btn-primary">
-                📝 LOG TODAY'S ACTIVITIES
+    {% include 'partials/character_overview.html' %}
+
+    <!-- Nav Dropdown -->
+    <div class="nav-bar">
+        <div class="nav-dropdown" id="nav-dropdown">
+            <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()">
+                <span id="nav-current-label">🎯 Today's Quest</span>
+                <span class="arrow">▼</span>
             </button>
-        </section>
-
-        <!-- Recent Logs -->
-        {% if logs %}
-        <section class="logs-section">
-            <h2>📜 RECENT LOGS</h2>
-            <div class="logs-list">
-                {% for log in logs %}
-                <div class="log-card">
-                    <div class="log-header">
-                        <strong>{{ log.date.strftime('%Y-%m-%d') }}</strong>
-                        <span class="log-points">+{{ log.total_points }}p</span>
-                    </div>
-                    {% if log.combos %}
-                    <div class="log-combos">
-                        {% for combo in log.combos %}
-                        <span class="badge">⚡ {{ combo }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
+            <div class="nav-menu" id="nav-menu">
+                <button class="nav-item active" onclick="showTab('quest', this, '🎯 Today\'s Quest')">🎯 Today's Quest</button>
+                <button class="nav-item" onclick="showTab('streaks', this, '🔥 Streaks')">🔥 Streaks</button>
+                <button class="nav-item" onclick="showTab('challenge', this, '⚡ Daily Challenge')">⚡ Daily Challenge</button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" onclick="showTab('analytics', this, '📊 Analytics')">📊 Analytics</button>
+                <button class="nav-item" onclick="showTab('history', this, '📜 History')">📜 History</button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" onclick="showTab('skilltree', this, '🌳 Skill Tree')">🌳 Skill Tree</button>
+                <button class="nav-item" onclick="showTab('achievements', this, '🏆 Achievements')">🏆 Achievements</button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" onclick="showTab('notes', this, '📝 Notes & Plans')">📝 Notes & Plans</button>
+                <button class="nav-item" onclick="showTab('budget', this, '💰 Budget')">💰 Budget</button>
+                <button class="nav-item" onclick="showTab('coding', this, '💻 Coding Skills')">💻 Coding Skills</button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" onclick="showTab('nemesis', this, '😈 Nemesis Mode')">😈 Nemesis Mode</button>
             </div>
-        </section>
-        {% endif %}
-    </div>
-
-    <!-- Modal -->
-    <div id="quest-form" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color:#00e5ff; margin:0;">📝 Log Today's Activities</h2>
-                <button class="close-btn" onclick="hideModal()">×</button>
-            </div>
-
-            <form method="POST" action="{{ url_for('main.log_activity') }}">
-                <!-- Date -->
-                <div style="margin-bottom:2rem;">
-                    <label style="display:block; margin-bottom:0.5rem; color:#a8b2c1; font-weight:600;">Date:</label>
-                    <input type="date" name="log_date" value="{{ now.strftime('%Y-%m-%d') }}" max="{{ now.strftime('%Y-%m-%d') }}" class="form-input">
-                </div>
-
-                <!-- Tier 1 -->
-                <div class="form-section">
-                    <h3 style="color:#ffd700;">🏆 TIER 1: FOUNDATION</h3>
-                    <label class="activity-item">
-                        <input type="checkbox" name="tier1_complete">
-                        <span>Complete all 4 core activities</span>
-                        <span class="activity-points">+20p</span>
-                    </label>
-                </div>
-
-                <!-- Physical -->
-                <div class="form-section">
-                    <h3 style="color:#ff6b6b;">⚔️ PHYSICAL HEALTH</h3>
-                    <label class="activity-item">
-                        <input type="checkbox" name="full_workout">
-                        <span>Full workout 30min</span>
-                        <span class="activity-points">+25p</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="light_exercise">
-                        <span>Light exercise 15min</span>
-                        <span class="activity-points">+12p</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="stretching">
-                        <span>Stretching 10min</span>
-                        <span class="activity-points">+5p</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="cold_shower">
-                        <span>Cold shower</span>
-                        <span class="activity-points">+3p</span>
-                    </label>
-                </div>
-
-                <!-- Mental -->
-                <div class="form-section">
-                    <h3 style="color:#4ecdc4;">🧠 MENTAL FOCUS</h3>
-                    <label class="activity-item">
-                        <input type="checkbox" name="deep_work">
-                        <span>Deep work session</span>
-                        <span class="activity-points">+20p</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="read_book">
-                        <span>Read book 30min</span>
-                        <span class="activity-points">+10p</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="code_practice">
-                        <span>Code practice</span>
-                        <span class="activity-points">+15p</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="meditation">
-                        <span>Meditation 10min</span>
-                        <span class="activity-points">+8p</span>
-                    </label>
-                </div>
-
-                <!-- Streaks -->
-                <div class="form-section" style="border-color:#ff6b35;">
-                    <h3 style="color:#ff6b35;">🔥 STREAKS</h3>
-                    <label class="activity-item">
-                        <input type="checkbox" name="no_porn">
-                        <span>No Porn Streak</span>
-                        <span style="color:#ff6b35; font-weight:bold;">🔥</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="workout">
-                        <span>Workout Streak</span>
-                        <span style="color:#ff6b35; font-weight:bold;">🔥</span>
-                    </label>
-                    <label class="activity-item">
-                        <input type="checkbox" name="meditation">
-                        <span>Meditation Streak</span>
-                        <span style="color:#ff6b35; font-weight:bold;">🔥</span>
-                    </label>
-                </div>
-
-                <!-- Notes -->
-                <div style="margin-bottom:2rem;">
-                    <label style="display:block; margin-bottom:0.5rem; color:#a8b2c1; font-weight:600;">Notes (optional):</label>
-                    <textarea name="notes" rows="3" placeholder="How was your day? Any reflections?" class="form-input" style="resize:vertical; font-family:inherit;"></textarea>
-                </div>
-
-                <!-- Submit -->
-                <button type="submit" class="btn-primary" style="width:100%; padding:1.25rem; font-size:1.2rem; box-shadow:0 4px 12px rgba(0,229,255,0.3);">
-                    ✅ SUBMIT QUEST
-                </button>
-            </form>
         </div>
     </div>
 
-    <script>
-        function showModal() {
-            document.getElementById('quest-form').classList.add('show');
-        }
-        function hideModal() {
-            document.getElementById('quest-form').classList.remove('show');
-        }
-    </script>
-</body>
-</html>
+    {% include 'partials/tab_quest.html' %}
+    {% include 'partials/tab_streaks.html' %}
+    {% include 'partials/tab_challenge.html' %}
+    {% include 'partials/tab_analytics.html' %}
+    {% include 'partials/tab_skilltree.html' %}
+    {% include 'partials/tab_achievements.html' %}
+    {% include 'partials/tab_notes.html' %}
+    {% include 'partials/tab_budget.html' %}
+    {% include 'partials/tab_coding.html' %}
+    {% include 'partials/tab_nemesis.html' %}
+    {% include 'partials/tab_history.html' %}
+    {% include 'partials/modal_log_activity.html' %}
 
-
+{% endblock %}

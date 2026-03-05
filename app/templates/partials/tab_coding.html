@@ -1,0 +1,70 @@
+<div id="tab-coding" class="tab-pane">
+    <div class="grid-2" style="margin-bottom:1.5rem;">
+        {% for lang_key, lang in prog_skills.languages.items() %}
+        <div class="prog-lang-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+                <h3>{{ lang.name }}</h3>
+                <span class="prog-lang-level">Lv. {{ lang.level }}</span>
+            </div>
+            <div class="stat-bar">
+                {% set prog_pct = ((lang.xp / lang.xp_to_next) * 100)|int if lang.xp_to_next else 0 %}
+                <div class="stat-bar-fill" style="width:{{ [prog_pct, 100]|min }}%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:0.5rem;font-size:0.8rem;color:#a8b2c1;">
+                <span>{{ lang.xp }} / {{ lang.xp_to_next }} XP</span>
+                <span>{{ lang.total_sessions }} sessions • {{ lang.total_hours|round(1) }}h</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <div class="section-title">LOG CODING SESSION</div>
+        <form method="POST" action="{{ url_for('main.log_prog_session') }}" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+                <label class="form-label">Language</label>
+                <select name="language" class="form-input">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="c">C</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">Task Type</label>
+                <select name="task_type" class="form-input">
+                    <option value="practice">Practice</option>
+                    <option value="project">Project</option>
+                    <option value="tutorial">Tutorial</option>
+                    <option value="problem_solving">Problem Solving</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">Duration (minutes)</label>
+                <input type="number" name="duration_minutes" value="30" min="5" max="480" class="form-input">
+            </div>
+            <div>
+                <label class="form-label">Description (optional)</label>
+                <input type="text" name="description" placeholder="What did you work on?" class="form-input">
+            </div>
+            <div style="grid-column:span 2;">
+                <button type="submit" class="btn btn-primary">💻 Log Session</button>
+            </div>
+        </form>
+    </div>
+
+    {% if prog_skills.session_history %}
+    <div class="card" style="margin-top:1rem;">
+        <div class="section-title">RECENT SESSIONS</div>
+        {% for session in prog_skills.session_history|reverse %}
+        {% if loop.index <= 5 %}
+        <div class="transaction-item">
+            <span>{{ session.language }} — {{ session.task_type.replace('_',' ').title() }}</span>
+            <span style="color:#7c4dff;">+{{ session.xp_earned }} XP</span>
+            <span style="color:#a8b2c1;">{{ session.duration_minutes }}min • {{ session.date }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

@@ -1,0 +1,21 @@
+<div id="tab-challenge" class="tab-pane">
+    {% if challenge_data and challenge_data.challenge %}
+    <div class="challenge-card" style="margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+                <h3>{{ challenge_data.challenge.name }}</h3>
+                <p style="color:#a8b2c1;margin:0.5rem 0;">{{ challenge_data.challenge.description }}</p>
+                <span class="badge">{{ challenge_data.challenge.category.upper() }}</span>
+            </div>
+            <div class="challenge-points">+{{ challenge_data.challenge.points }}p</div>
+        </div>
+        {% if challenge_data.completed %}
+        <p style="color:#00c853;margin-top:1rem;font-weight:700;">✅ COMPLETED!</p>
+        {% else %}
+        <form method="POST" action="{{ url_for('main.complete_challenge') }}" style="margin-top:1rem;">
+            <button type="submit" class="btn btn-success">✅ Mark Complete</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>

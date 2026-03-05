@@ -1,0 +1,24 @@
+<div id="tab-quest" class="tab-pane active">
+    <button onclick="showModal('log-modal')" class="btn btn-primary" style="margin-bottom:1rem;padding:1rem 2rem;font-size:1rem;">
+        📝 LOG TODAY'S ACTIVITIES
+    </button>
+
+    {% if logs %}
+    <div class="card">
+        <div class="section-title">TODAY'S LOG</div>
+        {% set today_log = logs[0] if logs and logs[0].date.strftime('%Y-%m-%d') == now.strftime('%Y-%m-%d') else None %}
+        {% if today_log %}
+            <p>Points logged today: <strong style="color:#ffd700;">{{ today_log.total_points }}</strong></p>
+            {% if today_log.combos %}
+            <div style="margin-top:0.5rem;">
+                {% for combo in today_log.combos %}
+                <span class="badge">⚡ {{ combo }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% else %}
+            <p style="color:#a8b2c1;">No activities logged yet today. Get started!</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>

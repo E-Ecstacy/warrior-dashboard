@@ -1,0 +1,22 @@
+<div id="tab-history" class="tab-pane">
+    {% if logs %}
+    {% for log in logs %}
+    <div class="log-card">
+        <div>
+            <strong>{{ log.date.strftime('%Y-%m-%d') }}</strong>
+            {% if log.tier1_complete %}<span class="badge" style="margin-left:0.5rem;">Tier 1 ✓</span>{% endif %}
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+            {% if log.combos %}
+                {% for combo in log.combos %}
+                <span class="badge">⚡ {{ combo }}</span>
+                {% endfor %}
+            {% endif %}
+            <span class="log-points">+{{ log.total_points }}p</span>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="card"><p style="color:#a8b2c1;">No logs yet. Start your first quest!</p></div>
+    {% endif %}
+</div>

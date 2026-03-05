@@ -1,0 +1,25 @@
+<div id="tab-achievements" class="tab-pane">
+    {% if achievements_earned %}
+    <div class="section-title" style="margin-bottom:0.75rem;">🏆 EARNED</div>
+    {% for ach in achievements_earned %}
+    <div class="achievement-card earned">
+        <div>
+            <strong>{{ ach.name }}</strong>
+            <div style="font-size:0.8rem;color:#a8b2c1;">{{ ach.description }}</div>
+        </div>
+        <span class="achievement-bonus">+{{ ach.points_bonus }}p</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="section-title" style="margin:1rem 0 0.75rem;">🔒 LOCKED</div>
+    {% for ach in achievements_available %}
+    <div class="achievement-card">
+        <div>
+            <strong style="color:#a8b2c1;">{{ ach.name }}</strong>
+            <div style="font-size:0.8rem;color:#666;">{{ ach.description }}</div>
+        </div>
+        <span class="achievement-bonus">+{{ ach.points_bonus }}p</span>
+    </div>
+    {% endfor %}
+</div>

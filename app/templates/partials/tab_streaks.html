@@ -1,0 +1,16 @@
+<div id="tab-streaks" class="tab-pane">
+    {% if active_streaks %}
+    <div class="section-title">🔥 ACTIVE STREAKS</div>
+    <div class="grid-3" style="margin-bottom:1rem;">
+        {% for streak_name, streak_data in active_streaks.items() %}
+        <div class="streak-card">
+            <h3 style="font-size:0.9rem;margin-bottom:0.5rem;">{{ streak_name.replace('_',' ').title() }}</h3>
+            <div class="streak-count">{{ streak_data['current'] }}</div>
+            <div class="streak-multiplier">days • ×{{ streak_data.get('multiplier',1.0) }} multiplier</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card"><p style="color:#a8b2c1;">No active streaks yet. Log activities to start streaks!</p></div>
+    {% endif %}
+</div>

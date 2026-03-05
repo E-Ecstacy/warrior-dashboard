@@ -1,0 +1,45 @@
+<div id="tab-notes" class="tab-pane">
+    <div class="grid-2" style="margin-bottom:1.5rem;">
+        <div class="card">
+            <div class="section-title">ADD NOTE (+2p)</div>
+            <form method="POST" action="{{ url_for('main.add_note') }}">
+                <input type="hidden" name="note_type" value="note">
+                <textarea name="content" rows="3" placeholder="Quick note, idea, reflection..." class="form-input" style="resize:vertical;font-family:inherit;margin-bottom:0.75rem;"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">💾 Save Note</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="section-title">ADD PLAN (+5p)</div>
+            <form method="POST" action="{{ url_for('main.add_note') }}">
+                <input type="hidden" name="note_type" value="plan">
+                <textarea name="content" rows="3" placeholder="Tomorrow's plan, goal, task..." class="form-input" style="resize:vertical;font-family:inherit;margin-bottom:0.75rem;"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">📋 Add Plan</button>
+            </form>
+        </div>
+    </div>
+
+    {% if plans %}
+    <div class="section-title" style="margin-bottom:0.75rem;">📋 ACTIVE PLANS</div>
+    {% for plan in plans %}
+    <div class="plan-item">
+        <span>{{ plan.content }}</span>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-shrink:0;">
+            <span style="font-size:0.75rem;color:#a8b2c1;">{{ plan.date }}</span>
+            <form method="POST" action="{{ url_for('main.complete_plan', plan_id=plan.id) }}">
+                <button type="submit" class="btn btn-success btn-sm">✅</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if notes %}
+    <div class="section-title" style="margin:1rem 0 0.75rem;">📝 RECENT NOTES</div>
+    {% for note in notes|reverse %}
+    <div class="note-item">
+        <div>{{ note.content }}</div>
+        <div class="note-date">{{ note.date }}</div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>

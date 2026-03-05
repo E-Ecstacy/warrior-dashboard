@@ -1,0 +1,182 @@
+<div id="log-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="color:#00e5ff;margin:0;">📝 Log Today's Activities</h2>
+            <button class="close-btn" onclick="hideModal('log-modal')">×</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('main.log_activity') }}">
+            <!-- Date -->
+            <div style="margin-bottom:1.5rem;">
+                <label class="form-label">Date:</label>
+                <input type="date" name="log_date" value="{{ now.strftime('%Y-%m-%d') }}" max="{{ now.strftime('%Y-%m-%d') }}" class="form-input" style="width:auto;">
+            </div>
+
+            <!-- Tier 1 -->
+            <div class="form-section">
+                <h3 style="color:#ffd700;">🏆 TIER 1: FOUNDATION</h3>
+                <label class="activity-item">
+                    <input type="checkbox" name="tier1_complete">
+                    <span>Complete all 4 core activities</span>
+                    <span class="activity-points">+20p</span>
+                </label>
+            </div>
+
+            <!-- Physical -->
+            <div class="form-section">
+                <h3 style="color:#ff6b6b;">⚔️ PHYSICAL</h3>
+                {% set physical = [
+                    ('full_workout','Full Workout 30min',25),
+                    ('light_exercise','Light Exercise 15min',12),
+                    ('push_ups_100','100 Push-ups',20),
+                    ('steps_10k','10k Steps',8),
+                    ('stretching','Stretching 10min',5),
+                    ('cold_shower','Cold Shower',3),
+                ] %}
+                {% for name, label, pts in physical %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span class="activity-points">+{{ pts }}p</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Mental -->
+            <div class="form-section">
+                <h3 style="color:#4ecdc4;">🧠 MENTAL</h3>
+                {% set mental = [
+                    ('deep_work','Deep Work Session',20),
+                    ('study_pomodoro','Study Pomodoro',8),
+                    ('read_book','Read Book 30min',10),
+                    ('online_course','Online Course',12),
+                    ('code_practice','Code Practice',15),
+                    ('code_project','Code Project',20),
+                    ('project_dev','Project Dev',15),
+                    ('new_skill','Learn New Skill',10),
+                    ('journal','Journal / Reflect',5),
+                ] %}
+                {% for name, label, pts in mental %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span class="activity-points">+{{ pts }}p</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Discipline -->
+            <div class="form-section">
+                <h3 style="color:#a8b2ff;">🛡️ DISCIPLINE</h3>
+                {% set discipline = [
+                    ('screen_under_2h','Screen < 2h',15),
+                    ('screen_2_4h','Screen 2-4h',5),
+                    ('no_phone_morning','No Phone Morning',5),
+                    ('no_phone_night','No Phone Night',5),
+                    ('plan_tomorrow','Plan Tomorrow',3),
+                    ('organize_space','Organize Space',8),
+                ] %}
+                {% for name, label, pts in discipline %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span class="activity-points">+{{ pts }}p</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Energy -->
+            <div class="form-section">
+                <h3 style="color:#ffd700;">⚡ ENERGY</h3>
+                {% set energy = [
+                    ('meditation','Meditation 10min',8),
+                    ('gratitude','Gratitude',3),
+                    ('breathwork','Breathwork',4),
+                    ('nature_walk','Nature Walk',10),
+                ] %}
+                {% for name, label, pts in energy %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span class="activity-points">+{{ pts }}p</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Influence -->
+            <div class="form-section">
+                <h3 style="color:#ff9f43;">👑 INFLUENCE</h3>
+                {% set social = [
+                    ('meaningful_conversation','Meaningful Conversation',8),
+                    ('help_someone_code','Help Someone Code',10),
+                    ('call_family','Call Family',5),
+                    ('teach_someone','Teach Someone',6),
+                    ('group_activity','Group Activity',7),
+                    ('networking','Networking',6),
+                    ('quality_time','Quality Time',10),
+                ] %}
+                {% for name, label, pts in social %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span class="activity-points">+{{ pts }}p</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Tier 3 -->
+            <div class="form-section" style="border-color:#7c4dff;">
+                <h3 style="color:#7c4dff;">💎 TIER 3: BOSS MOVES</h3>
+                {% set tier3 = [
+                    ('flow_state_4h','4h+ Flow State Deep Work',80),
+                    ('zero_screens','Zero Screens All Day',100),
+                    ('complete_todo','Complete Entire Todo List',50),
+                    ('cold_exposure','Extended Cold Exposure',30),
+                    ('new_algorithm','Master New Algorithm',60),
+                    ('teach_code','Teach Code to Someone',40),
+                ] %}
+                {% for name, label, pts in tier3 %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span class="activity-points">+{{ pts }}p</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Streaks -->
+            <div class="form-section" style="border-color:#ff6b35;">
+                <h3 style="color:#ff6b35;">🔥 STREAKS (mark if maintained today)</h3>
+                {% set streaks = [
+                    ('no_porn','No Porn'),
+                    ('workout','Workout'),
+                    ('meditation','Meditation'),
+                    ('deep_work','Deep Work'),
+                    ('reading','Reading'),
+                    ('coding_practice','Coding Practice'),
+                    ('sleep_7h','Sleep 7h+'),
+                    ('morning_routine','Morning Routine'),
+                    ('no_doomscroll','No Doomscroll'),
+                    ('screen_time_under_2h','Screen < 2h'),
+                ] %}
+                {% for name, label in streaks %}
+                <label class="activity-item">
+                    <input type="checkbox" name="{{ name }}">
+                    <span>{{ label }}</span>
+                    <span style="color:#ff6b35;">🔥</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Notes -->
+            <div style="margin-bottom:1.5rem;">
+                <label class="form-label">Notes (optional):</label>
+                <textarea name="notes" rows="3" placeholder="Reflections, how did you feel today?" class="form-input" style="resize:vertical;font-family:inherit;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:1.1rem;font-size:1.1rem;">
+                ✅ SUBMIT QUEST
+            </button>
+        </form>
+    </div>
+</div>

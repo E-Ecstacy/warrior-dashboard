@@ -1,0 +1,53 @@
+<div id="tab-analytics" class="tab-pane">
+    {% if analytics.total_days > 0 %}
+    <div class="analytics-grid" style="margin-bottom:1.5rem;">
+        <div class="analytics-stat">
+            <div class="big-number">{{ analytics.total_days }}</div>
+            <div class="label">Days Logged</div>
+        </div>
+        <div class="analytics-stat">
+            <div class="big-number">{{ analytics.average_points }}</div>
+            <div class="label">Avg Points/Day</div>
+        </div>
+        <div class="analytics-stat">
+            <div class="big-number">{{ analytics.best_day }}</div>
+            <div class="label">Best Day</div>
+        </div>
+        <div class="analytics-stat">
+            <div class="big-number">{{ analytics.worst_day }}</div>
+            <div class="label">Worst Day</div>
+        </div>
+    </div>
+
+    {% if analytics.top_activities %}
+    <div class="card" style="margin-bottom:1rem;">
+        <div class="section-title">TOP ACTIVITIES</div>
+        {% set max_count = analytics.top_activities[0][1] if analytics.top_activities else 1 %}
+        {% for activity, count in analytics.top_activities %}
+        <div class="activity-bar">
+            <div class="activity-bar-label">{{ activity.replace('_',' ').title() }}</div>
+            <div class="activity-bar-track">
+                <div class="activity-bar-fill" style="width:{{ (count / max_count * 100)|int }}%"></div>
+            </div>
+            <div class="activity-bar-count">{{ count }}x</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if analytics.weekly_trend %}
+    <div class="card">
+        <div class="section-title">WEEKLY TREND</div>
+        {% for week in analytics.weekly_trend %}
+        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #3a4050;">
+            <span style="color:#a8b2c1;">Week</span>
+            <span>{{ week.points }} pts</span>
+            <span style="color:#a8b2c1;">avg {{ week.avg }}/day</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="card"><p style="color:#a8b2c1;">Log at least 7 days to see analytics.</p></div>
+    {% endif %}
+</div>

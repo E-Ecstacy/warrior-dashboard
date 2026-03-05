@@ -1,0 +1,17 @@
+{% extends "auth/base.html" %}
+
+{% block title %}Register — Warrior Dashboard{% endblock %}
+{% block heading %}⚔️ Register{% endblock %}
+
+{% block form %}
+<form method="POST">
+    <input type="text" name="username" placeholder="Username" required autofocus>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Create Account</button>
+</form>
+{% endblock %}
+
+{% block footer_link %}
+    Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
+{% endblock %}
