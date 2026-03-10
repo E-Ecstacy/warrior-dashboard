@@ -39,12 +39,16 @@ class Character(db.Model):
     skill_tree   = db.Column(db.JSON, default=dict)
 
     # Feature columns added in refactor v2
-    daily_challenge = db.Column(db.JSON, default=dict)  # {date, challenge, completed}
-    notes           = db.Column(db.JSON, default=list)  # [{id, content, date}]
-    plans           = db.Column(db.JSON, default=list)  # [{id, content, date, completed}]
-    nemesis_mode    = db.Column(db.JSON, default=dict)  # {active, non_negotiables, gauge}
-    budget          = db.Column(db.JSON, default=dict)  # {balance, transactions:[]}
-    prog_skills     = db.Column(db.JSON, default=dict)  # {languages:{}, session_history:[]}
+    daily_challenge  = db.Column(db.JSON, default=dict)  # {date, challenge, completed}
+    notes            = db.Column(db.JSON, default=list)  # [{id, content, date}]
+    plans            = db.Column(db.JSON, default=list)  # [{id, content, date, completed}]
+    nemesis_mode     = db.Column(db.JSON, default=dict)  # {active, non_negotiables, gauge}
+    budget           = db.Column(db.JSON, default=dict)  # {balance, transactions:[]}
+    prog_skills      = db.Column(db.JSON, default=dict)  # {languages:{}, session_history:[]}
+
+    # Feature columns added in refactor v3
+    personal_records  = db.Column(db.JSON, default=dict)  # {exercises: {name: {weight,reps,sets,volume,date}}}
+    workout_sessions  = db.Column(db.JSON, default=dict)  # {templates: {}, history: []}
 
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

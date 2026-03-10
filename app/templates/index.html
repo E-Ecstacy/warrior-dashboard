@@ -1,17 +1,24 @@
 {% extends "base.html" %}
 
+{% block extra_styles %}
+.nav-bar { margin-left: -2rem; margin-right: -2rem; }
+@media(max-width:600px) { .nav-bar { margin-left: -1rem; margin-right: -1rem; } }
+{% endblock %}
+
 {% block content %}
 
-    <!-- Header -->
+    <!-- ── Header ── -->
     <header class="dashboard-header">
         <h1><span class="header-emoji">⚔️</span> WARRIOR DASHBOARD</h1>
-        <p class="tagline">"This isn't a schedule. This is your character arc."</p>
-        <div class="header-actions">
-            <a href="{{ url_for('main.logout') }}">Logout</a>
+        <div class="header-right">
+            <span class="tagline">"This isn't a schedule. This is your character arc."</span>
+            <div class="header-actions">
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            </div>
         </div>
     </header>
 
-    <!-- Flash Messages -->
+    <!-- ── Flash Messages ── -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -22,33 +29,64 @@
 
     {% include 'partials/character_overview.html' %}
 
-    <!-- Nav Dropdown -->
-    <div class="nav-bar">
-        <div class="nav-dropdown" id="nav-dropdown">
-            <button class="nav-toggle" id="nav-toggle" onclick="toggleNav()">
-                <span id="nav-current-label">🎯 Today's Quest</span>
-                <span class="arrow">▼</span>
-            </button>
-            <div class="nav-menu" id="nav-menu">
-                <button class="nav-item active" onclick="showTab('quest', this, '🎯 Today\'s Quest')">🎯 Today's Quest</button>
-                <button class="nav-item" onclick="showTab('streaks', this, '🔥 Streaks')">🔥 Streaks</button>
-                <button class="nav-item" onclick="showTab('challenge', this, '⚡ Daily Challenge')">⚡ Daily Challenge</button>
-                <div class="nav-divider"></div>
-                <button class="nav-item" onclick="showTab('analytics', this, '📊 Analytics')">📊 Analytics</button>
-                <button class="nav-item" onclick="showTab('history', this, '📜 History')">📜 History</button>
-                <div class="nav-divider"></div>
-                <button class="nav-item" onclick="showTab('skilltree', this, '🌳 Skill Tree')">🌳 Skill Tree</button>
-                <button class="nav-item" onclick="showTab('achievements', this, '🏆 Achievements')">🏆 Achievements</button>
-                <div class="nav-divider"></div>
-                <button class="nav-item" onclick="showTab('notes', this, '📝 Notes & Plans')">📝 Notes & Plans</button>
-                <button class="nav-item" onclick="showTab('budget', this, '💰 Budget')">💰 Budget</button>
-                <button class="nav-item" onclick="showTab('coding', this, '💻 Coding Skills')">💻 Coding Skills</button>
-                <div class="nav-divider"></div>
-                <button class="nav-item" onclick="showTab('nemesis', this, '😈 Nemesis Mode')">😈 Nemesis Mode</button>
-            </div>
-        </div>
-    </div>
+    <!-- ══ HORIZONTAL MEGA NAV ══ -->
+    <nav class="nav-bar">
+        <div class="nav-inner">
 
+            <div class="nav-group">
+                <button class="nav-group-btn has-active">Daily <span class="caret">▼</span></button>
+                <div class="nav-dropdown-panel">
+                    <button class="nav-item active" onclick="showTab('quest', this)">🎯 Today's Quest</button>
+                    <button class="nav-item" onclick="showTab('streaks', this)">🔥 Streaks</button>
+                    <button class="nav-item" onclick="showTab('challenge', this)">⚡ Daily Challenge</button>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-group-btn">Fitness <span class="caret">▼</span></button>
+                <div class="nav-dropdown-panel">
+                    <button class="nav-item" onclick="showTab('workouts', this)">💪 Workout Sessions</button>
+                    <button class="nav-item" onclick="showTab('records', this)">🏋️ Personal Records</button>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-group-btn">Mind <span class="caret">▼</span></button>
+                <div class="nav-dropdown-panel">
+                    <button class="nav-item" onclick="showTab('coding', this)">💻 Coding Skills</button>
+                    <button class="nav-item" onclick="showTab('notes', this)">📝 Notes & Plans</button>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-group-btn">Progress <span class="caret">▼</span></button>
+                <div class="nav-dropdown-panel">
+                    <button class="nav-item" onclick="showTab('analytics', this)">📊 Analytics</button>
+                    <button class="nav-item" onclick="showTab('ghost', this)">👻 Ghost Data</button>
+                    <button class="nav-item" onclick="showTab('history', this)">📜 History</button>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-group-btn">Rewards <span class="caret">▼</span></button>
+                <div class="nav-dropdown-panel">
+                    <button class="nav-item" onclick="showTab('skilltree', this)">🌳 Skill Tree</button>
+                    <button class="nav-item" onclick="showTab('achievements', this)">🏆 Achievements</button>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-group-btn">Life <span class="caret">▼</span></button>
+                <div class="nav-dropdown-panel">
+                    <button class="nav-item" onclick="showTab('budget', this)">💰 Budget</button>
+                    <button class="nav-item" onclick="showTab('nemesis', this)">😈 Nemesis Mode</button>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ══ TAB PANES ══ -->
     {% include 'partials/tab_quest.html' %}
     {% include 'partials/tab_streaks.html' %}
     {% include 'partials/tab_challenge.html' %}
@@ -60,6 +98,9 @@
     {% include 'partials/tab_coding.html' %}
     {% include 'partials/tab_nemesis.html' %}
     {% include 'partials/tab_history.html' %}
+    {% include 'partials/tab_personal_records.html' %}
+    {% include 'partials/tab_workout_sessions.html' %}
+    {% include 'partials/tab_ghost_data.html' %}
     {% include 'partials/modal_log_activity.html' %}
 
 {% endblock %}

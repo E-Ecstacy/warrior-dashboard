@@ -1,53 +1,190 @@
 <div id="tab-analytics" class="tab-pane">
     {% if analytics.total_days > 0 %}
-    <div class="analytics-grid" style="margin-bottom:1.5rem;">
-        <div class="analytics-stat">
-            <div class="big-number">{{ analytics.total_days }}</div>
-            <div class="label">Days Logged</div>
-        </div>
-        <div class="analytics-stat">
-            <div class="big-number">{{ analytics.average_points }}</div>
-            <div class="label">Avg Points/Day</div>
-        </div>
-        <div class="analytics-stat">
-            <div class="big-number">{{ analytics.best_day }}</div>
-            <div class="label">Best Day</div>
-        </div>
-        <div class="analytics-stat">
-            <div class="big-number">{{ analytics.worst_day }}</div>
-            <div class="label">Worst Day</div>
-        </div>
-    </div>
-
-    {% if analytics.top_activities %}
-    <div class="card" style="margin-bottom:1rem;">
-        <div class="section-title">TOP ACTIVITIES</div>
-        {% set max_count = analytics.top_activities[0][1] if analytics.top_activities else 1 %}
-        {% for activity, count in analytics.top_activities %}
-        <div class="activity-bar">
-            <div class="activity-bar-label">{{ activity.replace('_',' ').title() }}</div>
-            <div class="activity-bar-track">
-                <div class="activity-bar-fill" style="width:{{ (count / max_count * 100)|int }}%"></div>
+    
+        <!-- Stat summary row -->
+        <div class="analytics-grid" style="margin-bottom:1.5rem;">
+            <div class="analytics-stat">
+                <div class="big-number">{{ analytics.total_days }}</div>
+                <div class="label">Days Logged</div>
             </div>
-            <div class="activity-bar-count">{{ count }}x</div>
+            <div class="analytics-stat">
+                <div class="big-number">{{ analytics.average_points }}</div>
+                <div class="label">Avg / Day</div>
+            </div>
+            <div class="analytics-stat">
+                <div class="big-number" style="color:#00c853;">{{ analytics.best_day }}</div>
+                <div class="label">Best Day</div>
+            </div>
+            <div class="analytics-stat">
+                <div class="big-number" style="color:#ff5370;">{{ analytics.worst_day }}</div>
+                <div class="label">Worst Day</div>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    {% if analytics.weekly_trend %}
-    <div class="card">
-        <div class="section-title">WEEKLY TREND</div>
-        {% for week in analytics.weekly_trend %}
-        <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #3a4050;">
-            <span style="color:#a8b2c1;">Week</span>
-            <span>{{ week.points }} pts</span>
-            <span style="color:#a8b2c1;">avg {{ week.avg }}/day</span>
+    
+        <div class="grid-2" style="margin-bottom:1.5rem;align-items:start;">
+    
+            <!-- ── Spider / Radar Chart ── -->
+            <div class="card">
+                <div class="section-title">STAT RADAR</div>
+                <div style="display:flex;justify-content:center;align-items:center;">
+                    <canvas id="radarChart" width="300" height="300"></canvas>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;justify-content:center;">
+                    {% for stat_name, color in [('strength','#ff6b6b'),('intellect','#4ecdc4'),('discipline','#a8b2ff'),('energy','#ffd700'),('influence','#ff9f43')] %}
+                    <span style="font-size:0.72rem;color:{{ color }};display:flex;align-items:center;gap:0.3rem;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:{{ color }};display:inline-block;"></span>
+                        {{ stat_name.title() }} Lv.{{ stats[stat_name]['level'] }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- ── Top Activities ── -->
+            <div class="card">
+                <div class="section-title">TOP ACTIVITIES</div>
+                {% if analytics.top_activities %}
+                {% set max_count = analytics.top_activities[0][1] if analytics.top_activities else 1 %}
+                {% for activity, count in analytics.top_activities %}
+                <div class="activity-bar">
+                    <div class="activity-bar-label">{{ activity.replace('_',' ').title() }}</div>
+                    <div class="activity-bar-track">
+                        <div class="activity-bar-fill" style="width:{{ (count / max_count * 100)|int }}%"></div>
+                    </div>
+                    <div class="activity-bar-count">{{ count }}×</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color:#4a5160;font-size:0.85rem;">No activity data yet.</p>
+                {% endif %}
+            </div>
+    
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+    
+        <!-- ── Weekly Trend ── -->
+        {% if analytics.weekly_trend %}
+        <div class="card">
+            <div class="section-title">WEEKLY TREND</div>
+            <div style="display:grid;grid-template-columns:repeat({{ analytics.weekly_trend|length }},1fr);gap:0.75rem;margin-top:0.5rem;">
+                {% for week in analytics.weekly_trend %}
+                {% set week_num = loop.index %}
+                <div style="text-align:center;">
+                    <div style="font-size:0.68rem;color:#4a5160;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:1px;">
+                        Week {{ week_num }}
+                    </div>
+                    <!-- Mini bar -->
+                    {% set bar_pct = [((week.points / (analytics.best_day * 7)) * 100)|int, 100]|min if analytics.best_day else 0 %}
+                    <div style="height:60px;background:#23262f;border-radius:3px;position:relative;overflow:hidden;">
+                        <div style="position:absolute;bottom:0;left:0;right:0;height:{{ bar_pct }}%;background:linear-gradient(180deg,#00e5ff,#7c4dff);border-radius:3px;transition:height 0.4s;"></div>
+                    </div>
+                    <div style="font-size:0.88rem;font-weight:600;color:#e0e6f0;margin-top:0.4rem;">{{ week.points }}</div>
+                    <div style="font-size:0.68rem;color:#4a5160;">{{ week.avg }}/day</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    
     {% else %}
-    <div class="card"><p style="color:#a8b2c1;">Log at least 7 days to see analytics.</p></div>
+        <div class="card" style="text-align:center;padding:3rem;">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
+            <p style="color:#4a5160;">Log activities for at least a few days to unlock analytics.</p>
+        </div>
     {% endif %}
-</div>
+    </div>
+    
+    <script>
+    (function() {
+        // Stat levels from Jinja
+        const statLevels = {
+            strength:   {{ stats['strength']['level'] }},
+            intellect:  {{ stats['intellect']['level'] }},
+            discipline: {{ stats['discipline']['level'] }},
+            energy:     {{ stats['energy']['level'] }},
+            influence:  {{ stats['influence']['level'] }},
+        };
+        const labels  = ['Strength', 'Intellect', 'Discipline', 'Energy', 'Influence'];
+        const values  = [statLevels.strength, statLevels.intellect, statLevels.discipline, statLevels.energy, statLevels.influence];
+        const colors  = ['#ff6b6b', '#4ecdc4', '#a8b2ff', '#ffd700', '#ff9f43'];
+        const maxVal  = Math.max(...values, 5); // at least 5 so new users see a shape
+    
+        const canvas  = document.getElementById('radarChart');
+        if (!canvas) return;
+        const ctx     = canvas.getContext('2d');
+        const cx = 150, cy = 150, r = 110;
+        const n = labels.length;
+    
+        function pt(i, val) {
+            const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+            const frac  = val / maxVal;
+            return {
+                x: cx + Math.cos(angle) * r * frac,
+                y: cy + Math.sin(angle) * r * frac
+            };
+        }
+        function ptFull(i, frac) {
+            const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+            return {
+                x: cx + Math.cos(angle) * r * frac,
+                y: cy + Math.sin(angle) * r * frac
+            };
+        }
+    
+        // Background grid rings
+        const rings = [0.2, 0.4, 0.6, 0.8, 1.0];
+        rings.forEach(frac => {
+            ctx.beginPath();
+            for (let i = 0; i < n; i++) {
+                const p = ptFull(i, frac);
+                i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = frac === 1.0 ? '#2a2d38' : '#23262f';
+            ctx.lineWidth   = frac === 1.0 ? 1.5 : 1;
+            ctx.stroke();
+        });
+    
+        // Axis lines
+        for (let i = 0; i < n; i++) {
+            const p = ptFull(i, 1.0);
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(p.x, p.y);
+            ctx.strokeStyle = '#23262f';
+            ctx.lineWidth   = 1;
+            ctx.stroke();
+        }
+    
+        // Data polygon fill
+        ctx.beginPath();
+        values.forEach((v, i) => {
+            const p = pt(i, v);
+            i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle   = 'rgba(0,229,255,0.08)';
+        ctx.strokeStyle = 'rgba(0,229,255,0.5)';
+        ctx.lineWidth   = 1.5;
+        ctx.fill();
+        ctx.stroke();
+    
+        // Data points + color dots
+        values.forEach((v, i) => {
+            const p = pt(i, v);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+        });
+    
+        // Labels
+        ctx.font         = '11px Inter, Segoe UI, sans-serif';
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        labels.forEach((label, i) => {
+            const p    = ptFull(i, 1.28);
+            ctx.fillStyle = colors[i];
+            ctx.fillText(label, p.x, p.y);
+        });
+    })();
+    </script>
+    

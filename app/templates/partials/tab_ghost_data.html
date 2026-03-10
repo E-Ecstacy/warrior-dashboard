@@ -1,0 +1,137 @@
+<div id="tab-workouts" class="tab-pane">
+    <div class="grid-2" style="margin-bottom:1.5rem;align-items:start;">
+
+        <!-- Create Template -->
+        <div class="card">
+            <div class="section-title">📋 CREATE TEMPLATE</div>
+            <form method="POST" action="{{ url_for('main.save_workout_template') }}">
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Template Name</label>
+                    <input type="text" name="template_name" placeholder="e.g. Push Day" class="form-input" required>
+                </div>
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Day (optional)</label>
+                    <select name="template_day" class="form-input">
+                        <option value="">Any day</option>
+                        <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+                        <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Exercises (one per line)</label>
+                    <textarea name="template_exercises" rows="5"
+                              placeholder="Bench Press&#10;Overhead Press&#10;Tricep Dips&#10;Lateral Raises"
+                              class="form-input" style="resize:vertical;font-family:inherit;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">💾 Save Template</button>
+            </form>
+        </div>
+
+        <!-- Log Session -->
+        <div class="card">
+            <div class="section-title">💪 LOG SESSION</div>
+            {% set templates = workout_sessions.get('templates', {}) %}
+            {% if templates %}
+            <form method="POST" action="{{ url_for('main.log_workout_session') }}" id="session-form">
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Template</label>
+                    <select name="template_id" class="form-input" onchange="loadTemplate(this.value)">
+                        <option value="">Select template...</option>
+                        {% for tid, tmpl in templates.items() %}
+                        <option value="{{ tid }}" data-exercises="{{ tmpl.exercises | join('||') }}">
+                            {{ tmpl.name }}{% if tmpl.day %} — {{ tmpl.day }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="exercise-checklist" style="margin-bottom:0.75rem;"></div>
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" name="duration_minutes" min="5" max="300" placeholder="45" class="form-input">
+                </div>
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Notes (optional)</label>
+                    <input type="text" name="session_notes" placeholder="How it felt, PRs hit..." class="form-input">
+                </div>
+                <button type="submit" class="btn btn-success">✅ Log Session (+25p)</button>
+            </form>
+            {% else %}
+            <p style="color:#a8b2c1;">Create a template first, then log sessions against it.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Templates List -->
+    {% set templates = workout_sessions.get('templates', {}) %}
+    {% if templates %}
+    <div class="section-title" style="margin-bottom:0.75rem;">📂 YOUR TEMPLATES</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem;margin-bottom:1.5rem;">
+        {% for tid, tmpl in templates.items() %}
+        <div class="card" style="border-color:#7c4dff;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                    <strong>{{ tmpl.name }}</strong>
+                    {% if tmpl.day %}<span style="color:#a8b2c1;font-size:0.8rem;"> — {{ tmpl.day }}</span>{% endif %}
+                    <ul style="margin-top:0.5rem;padding-left:1.1rem;color:#a8b2c1;font-size:0.82rem;">
+                        {% for ex in tmpl.exercises %}
+                        <li>{{ ex }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <form method="POST" action="{{ url_for('main.delete_workout_template') }}">
+                    <input type="hidden" name="template_id" value="{{ tid }}">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Delete template?')">✕</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Session History -->
+    {% set history = workout_sessions.get('history', []) %}
+    {% if history %}
+    <div class="section-title" style="margin-bottom:0.75rem;">📜 RECENT SESSIONS</div>
+    {% for session in history | reverse %}
+    {% if loop.index <= 10 %}
+    <div class="log-card">
+        <div>
+            <strong>{{ session.template_name }}</strong>
+            <span style="color:#a8b2c1;font-size:0.8rem;margin-left:0.5rem;">{{ session.date }}</span>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+            <span style="color:#a8b2c1;font-size:0.85rem;">{{ session.duration_minutes }}min</span>
+            <span style="color:#7c4dff;font-size:0.85rem;">{{ session.exercises_completed | length }} exercises</span>
+            {% if session.notes %}
+            <span style="color:#666;font-size:0.8rem;font-style:italic;">{{ session.notes }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+</div>
+
+<script>
+function loadTemplate(templateId) {
+    const select    = document.querySelector('select[name="template_id"]');
+    const option    = select.querySelector(`option[value="${templateId}"]`);
+    const container = document.getElementById('exercise-checklist');
+    container.innerHTML = '';
+    if (!option || !option.dataset.exercises) return;
+    const exercises = option.dataset.exercises.split('||').filter(Boolean);
+    if (!exercises.length) return;
+    const label = document.createElement('label');
+    label.className = 'form-label';
+    label.textContent = 'Exercises completed';
+    container.appendChild(label);
+    exercises.forEach(ex => {
+        const item = document.createElement('label');
+        item.className = 'activity-item';
+        item.innerHTML = `<input type="checkbox" name="completed_exercises" value="${ex}"> <span>${ex}</span>`;
+        container.appendChild(item);
+    });
+}
+</script>

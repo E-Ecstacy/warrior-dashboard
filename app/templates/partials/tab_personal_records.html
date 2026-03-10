@@ -1,0 +1,69 @@
+<div id="tab-records" class="tab-pane">
+
+  <!-- Log New PR -->
+  <div class="card" style="margin-bottom:1.5rem;">
+      <div class="section-title">🏋️ LOG PERSONAL RECORD</div>
+      <form method="POST" action="{{ url_for('main.log_personal_record') }}"
+            style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;align-items:end;">
+          <div>
+              <label class="form-label">Exercise</label>
+              <input type="text" name="exercise_name" placeholder="e.g. Bench Press" class="form-input" required>
+          </div>
+          <div>
+              <label class="form-label">Weight (kg/lbs)</label>
+              <input type="number" name="weight" step="0.5" min="0" placeholder="80" class="form-input" required>
+          </div>
+          <div>
+              <label class="form-label">Reps</label>
+              <input type="number" name="reps" min="1" placeholder="5" class="form-input" required>
+          </div>
+          <div>
+              <label class="form-label">Sets</label>
+              <input type="number" name="sets" min="1" value="1" class="form-input" required>
+          </div>
+          <div style="grid-column:span 4;">
+              <button type="submit" class="btn btn-primary">🏆 Submit PR</button>
+              <span style="color:#a8b2c1;font-size:0.8rem;margin-left:1rem;">
+                  Points awarded only if it beats your previous best
+              </span>
+          </div>
+      </form>
+  </div>
+
+  <!-- Current PRs -->
+  {% set exercises = personal_records.get('exercises', {}) %}
+  {% if exercises %}
+  <div class="section-title" style="margin-bottom:0.75rem;">🥇 YOUR RECORDS</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;">
+      {% for name, record in exercises.items() %}
+      <div class="card" style="border-color:#ff6b35;position:relative;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                  <strong style="font-size:1rem;">{{ name }}</strong>
+                  <div style="margin-top:0.5rem;">
+                      <span style="font-size:1.4rem;font-weight:700;color:#ffd700;">
+                          {{ record.weight }}kg × {{ record.reps }} reps × {{ record.sets }} sets
+                      </span>
+                  </div>
+                  <div style="font-size:0.8rem;color:#a8b2c1;margin-top:0.25rem;">
+                      Volume: <strong style="color:#00e5ff;">{{ record.volume | round(0) | int }}</strong>
+                      {% if record.previous_volume > 0 %}
+                      — prev: {{ record.previous_volume | round(0) | int }}
+                      {% endif %}
+                  </div>
+                  <div style="font-size:0.75rem;color:#666;margin-top:0.25rem;">Set {{ record.date }}</div>
+              </div>
+              <form method="POST" action="{{ url_for('main.delete_personal_record') }}">
+                  <input type="hidden" name="exercise_name" value="{{ name }}">
+                  <button type="submit" class="btn btn-danger btn-sm"
+                          onclick="return confirm('Delete PR for {{ name }}?')">✕</button>
+              </form>
+          </div>
+      </div>
+      {% endfor %}
+  </div>
+  {% else %}
+  <div class="card"><p style="color:#a8b2c1;">No personal records yet. Log your first lift above!</p></div>
+  {% endif %}
+
+</div>

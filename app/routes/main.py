@@ -1,7 +1,7 @@
 """Main Routes - All Features, Server-Side Rendering"""
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from datetime import datetime
+from datetime import datetime, timedelta
 from copy import deepcopy
 from sqlalchemy.orm.attributes import flag_modified
 from app.models import db, Character, DailyLog
@@ -188,6 +188,40 @@ def _default_prog_skills():
             'session_history': []}
 
 
+def _build_ghost_data(logs):
+    if len(logs) < 7:
+        return {'has_ghost': False, 'message': 'Need at least 7 days of data'}
+
+    recent_week = logs[-7:]
+    weekly_avg  = round(sum(l.total_points for l in recent_week) / 7, 1)
+
+    best_week = 0
+    if len(logs) >= 14:
+        for i in range(len(logs) - 6):
+            week_pts = sum(l.total_points for l in logs[i:i+7])
+            if week_pts > best_week:
+                best_week = week_pts
+
+    today_str      = datetime.now().strftime('%Y-%m-%d')
+    last_week_str  = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+    from datetime import date as date_type
+    today_entry     = next((l for l in logs if l.date.strftime('%Y-%m-%d') == today_str), None)
+    last_week_entry = next((l for l in logs if l.date.strftime('%Y-%m-%d') == last_week_str), None)
+    today_pts       = today_entry.total_points if today_entry else 0
+    last_week_pts   = last_week_entry.total_points if last_week_entry else 0
+
+    return {
+        'has_ghost': True,
+        'weekly_average': weekly_avg,
+        'best_week': best_week,
+        'today': today_pts,
+        'last_week': last_week_pts,
+        'difference': today_pts - last_week_pts,
+        'winning': today_pts >= last_week_pts,
+        'total_days': len(logs),
+    }
+
+
 # ─── Routes ───────────────────────────────────────────────────────────────────
 
 @bp.route('/')
@@ -235,6 +269,17 @@ def index():
     # Coding / Prog skills
     prog_skills = character.prog_skills or _default_prog_skills()
 
+    # Personal Records
+    personal_records = character.personal_records or {'exercises': {}}
+
+    # Workout Sessions
+    workout_sessions = character.workout_sessions or {'templates': {}, 'history': []}
+
+    # Ghost Data — compare this week vs last week
+    all_logs_ghost = DailyLog.query.filter_by(user_id=current_user.id)\
+        .order_by(DailyLog.date.asc()).all()
+    ghost_data = _build_ghost_data(all_logs_ghost)
+
     return render_template('index.html',
         character=character,
         stats=stats,
@@ -253,6 +298,9 @@ def index():
         budget=budget,
         budget_summary=budget_summary,
         prog_skills=prog_skills,
+        personal_records=personal_records,
+        workout_sessions=workout_sessions,
+        ghost_data=ghost_data,
     )
 
 
@@ -582,6 +630,182 @@ def toggle_nemesis():
     except Exception:
         import traceback; traceback.print_exc()
         flash('Error toggling nemesis mode', 'error')
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/log-personal-record', methods=['POST'])
+@login_required
+def log_personal_record():
+    try:
+        character    = get_or_create_character()
+        records      = dict(character.personal_records or {})
+        exercises    = dict(records.get('exercises', {}))
+        exercise     = request.form.get('exercise_name', '').strip()
+        weight       = float(request.form.get('weight', 0))
+        reps         = int(request.form.get('reps', 0))
+        sets         = int(request.form.get('sets', 1))
+
+        if not exercise:
+            flash('Exercise name required', 'error')
+            return redirect(url_for('main.index'))
+
+        new_volume = weight * reps * sets
+        is_pr      = False
+        points     = 0
+        old_volume = 0
+
+        if exercise in exercises:
+            old = exercises[exercise]
+            old_volume = old['weight'] * old['reps'] * old['sets']
+            if new_volume > old_volume:
+                is_pr = True
+                pct   = ((new_volume - old_volume) / old_volume) * 100 if old_volume else 100
+                points = 8 if pct >= 20 else 7 if pct >= 10 else 6 if pct >= 5 else 5
+                exercises[exercise] = {
+                    'weight': weight, 'reps': reps, 'sets': sets,
+                    'volume': new_volume, 'date': datetime.now().strftime('%Y-%m-%d'),
+                    'previous_volume': old_volume
+                }
+                flash(f'🏆 NEW PR on {exercise}! +{points}p', 'success')
+            else:
+                flash(f'Logged {exercise} — not a PR yet (best: {old_volume:.0f} vol)', 'success')
+        else:
+            is_pr  = True
+            points = 5
+            exercises[exercise] = {
+                'weight': weight, 'reps': reps, 'sets': sets,
+                'volume': new_volume, 'date': datetime.now().strftime('%Y-%m-%d'),
+                'previous_volume': 0
+            }
+            flash(f'🏆 First PR logged for {exercise}! +{points}p', 'success')
+
+        if is_pr and points:
+            character.total_points += points
+            character.stats = update_stats(character.stats or {}, {'strength': points})
+
+        records['exercises'] = exercises
+        character.personal_records = records
+        save_character(character)
+
+    except Exception:
+        import traceback; traceback.print_exc()
+        flash('Error logging personal record', 'error')
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/delete-personal-record', methods=['POST'])
+@login_required
+def delete_personal_record():
+    try:
+        character = get_or_create_character()
+        records   = dict(character.personal_records or {})
+        exercises = dict(records.get('exercises', {}))
+        exercise  = request.form.get('exercise_name', '').strip()
+        if exercise in exercises:
+            del exercises[exercise]
+            records['exercises'] = exercises
+            character.personal_records = records
+            save_character(character)
+            flash(f'Deleted PR for {exercise}', 'success')
+    except Exception:
+        import traceback; traceback.print_exc()
+        flash('Error deleting record', 'error')
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/save-workout-template', methods=['POST'])
+@login_required
+def save_workout_template():
+    try:
+        character = get_or_create_character()
+        ws        = dict(character.workout_sessions or {'templates': {}, 'history': []})
+        templates = dict(ws.get('templates', {}))
+
+        name      = request.form.get('template_name', '').strip()
+        day       = request.form.get('template_day', '')
+        exercises = request.form.get('template_exercises', '')  # newline-separated
+
+        if not name:
+            flash('Template name required', 'error')
+            return redirect(url_for('main.index'))
+
+        template_id = name.lower().replace(' ', '_')
+        exercise_list = [e.strip() for e in exercises.splitlines() if e.strip()]
+
+        templates[template_id] = {
+            'id': template_id, 'name': name, 'day': day,
+            'exercises': exercise_list,
+            'created': datetime.now().strftime('%Y-%m-%d')
+        }
+        ws['templates'] = templates
+        character.workout_sessions = ws
+        save_character(character)
+        flash(f'✅ Template "{name}" saved!', 'success')
+    except Exception:
+        import traceback; traceback.print_exc()
+        flash('Error saving template', 'error')
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/delete-workout-template', methods=['POST'])
+@login_required
+def delete_workout_template():
+    try:
+        character   = get_or_create_character()
+        ws          = dict(character.workout_sessions or {'templates': {}, 'history': []})
+        template_id = request.form.get('template_id', '')
+        templates   = dict(ws.get('templates', {}))
+        if template_id in templates:
+            del templates[template_id]
+            ws['templates'] = templates
+            character.workout_sessions = ws
+            save_character(character)
+            flash('Template deleted', 'success')
+    except Exception:
+        import traceback; traceback.print_exc()
+        flash('Error deleting template', 'error')
+    return redirect(url_for('main.index'))
+
+
+@bp.route('/log-workout-session', methods=['POST'])
+@login_required
+def log_workout_session():
+    try:
+        character   = get_or_create_character()
+        ws          = dict(character.workout_sessions or {'templates': {}, 'history': []})
+        history     = list(ws.get('history', []))
+        template_id = request.form.get('template_id', '')
+        templates   = ws.get('templates', {})
+        template    = templates.get(template_id, {})
+        duration    = int(request.form.get('duration_minutes', 0))
+        notes_text  = request.form.get('session_notes', '')
+
+        # Which exercises were completed (checkboxes)
+        completed_exercises = request.form.getlist('completed_exercises')
+
+        session = {
+            'id': len(history) + 1,
+            'template_id': template_id,
+            'template_name': template.get('name', 'Custom'),
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'exercises_completed': completed_exercises,
+            'duration_minutes': duration,
+            'notes': notes_text
+        }
+        history.append(session)
+
+        # Points: base 25 + up to 15 bonus for exercises
+        points = 25 + min(len(completed_exercises) * 2, 15)
+        character.total_points  += points
+        character.stats = update_stats(character.stats or {}, {'strength': points})
+
+        ws['history'] = history[-50:]
+        character.workout_sessions = ws
+        save_character(character)
+        flash(f'💪 Workout logged! +{points}p', 'success')
+    except Exception:
+        import traceback; traceback.print_exc()
+        flash('Error logging workout session', 'error')
     return redirect(url_for('main.index'))
 
 
