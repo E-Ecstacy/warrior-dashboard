@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from copy import deepcopy
 from sqlalchemy.orm.attributes import flag_modified
-from app.models import db, Character, DailyLog
+from app.models import User, db, Character, DailyLog
 from app.features.points import calculate_activity_points, calculate_tier1_points
 from app.features.stats import calculate_stat_xp, update_stats
 from app.features.streaks import update_streaks
@@ -63,6 +63,21 @@ ACHIEVEMENTS_LIST = [
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
+
+@bp.route('/edit-username', methods=['POST'])
+@login_required
+def edit_username():
+    new_username = request.form.get('username')
+    existing_user = User.query.filter_by(username=new_username).first()
+    if current_user.username == new_username:
+        flash("New usernames matches with the old one" , "error")
+    elif existing_user and existing_user.id != current_user.id:
+        flash("Username already taken", "error")
+    else:
+        flash("Username updated!", 'success')
+        current_user.username = new_username
+        db.session.commit()
+        return redirect(url_for('main.index'))
 
 def get_or_create_character():
     character = Character.query.filter_by(user_id=current_user.id).first()

@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 
-{% block extra_styles %}
-.nav-bar { margin-left: -2rem; margin-right: -2rem; }
-@media(max-width:600px) { .nav-bar { margin-left: -1rem; margin-right: -1rem; } }
-{% endblock %}
+
 
 {% block content %}
 
@@ -11,8 +8,9 @@
     <header class="dashboard-header">
         <h1><span class="header-emoji">⚔️</span> WARRIOR DASHBOARD</h1>
         <div class="header-right">
-            <span class="tagline">"This isn't a schedule. This is your character arc."</span>
+            <span class="tagline">"Today - is your day."</span>
             <div class="header-actions">
+                <button class="btn btn-secondary btn-sm" onclick="showModal('modal-profile')">⚙️ {{ current_user.username }}</button>
                 <a href="{{ url_for('main.logout') }}">Logout</a>
             </div>
         </div>
@@ -102,5 +100,6 @@
     {% include 'partials/tab_workout_sessions.html' %}
     {% include 'partials/tab_ghost_data.html' %}
     {% include 'partials/modal_log_activity.html' %}
+    {% include 'partials/profile.html'%}
 
 {% endblock %}
