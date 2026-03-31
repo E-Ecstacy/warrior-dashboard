@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+ 
+{% block title %}⚔️ Warrior Roadmap{% endblock %}
+ 
+{% block extra_styles %}
+.roadmap-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    padding: 1.25rem 0 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 1.5rem;
+}
+.roadmap-header h1 {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 1.45rem; font-weight: 900; letter-spacing: 1px;
+    -webkit-text-stroke: 1.5px #008b8b;
+    color: #ffffff; paint-order: stroke fill; line-height: 1;
+}
+.roadmap-date { font-size: 0.78rem; color: #4a5160; margin-top: 0.3rem; }
+.roadmap-today-xp { font-size: 1.1rem; font-weight: 700; color: #ffd700; white-space: nowrap; }
+.roadmap-today-xp span { font-size: 0.75rem; color: #4a5160; font-weight: 400; margin-left: 0.3rem; }
+ 
+.category-summary { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+.cat-pill {
+    background: #1a1d26; border: 1px solid #1e2130;
+    border-radius: 20px; padding: 0.25rem 0.75rem;
+    font-size: 0.75rem; color: #6a7180;
+}
+.cat-pill b { color: #c8d0de; }
+ 
+.layer-section { margin-bottom: 1rem; }
+.layer-toggle {
+    width: 100%; background: #1a1d26; border: 1px solid #1e2130;
+    border-radius: 8px; padding: 0.75rem 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; color: #c8d0de; font-weight: 600; font-size: 0.9rem;
+    transition: border-color 0.15s;
+}
+.layer-toggle:hover { border-color: rgba(0,229,255,0.2); }
+.layer-toggle .layer-meta { font-size: 0.72rem; color: #4a5160; font-weight: 400; }
+.layer-toggle.open .layer-meta::after { content: ' ▲'; }
+.layer-toggle:not(.open) .layer-meta::after { content: ' ▼'; }
+ 
+.layer-body { display: none; padding: 0.5rem 0 0; }
+.layer-body.open { display: block; }
+ 
+.trait-row {
+    display: flex; align-items: center; gap: 0.75rem;
+    background: #1a1d26; border: 1px solid #1e2130;
+    border-radius: 8px; padding: 0.65rem 1rem;
+    margin-bottom: 0.35rem;
+    transition: border-color 0.15s;
+}
+.trait-row.checked { border-color: rgba(0,200,83,0.25); }
+.trait-row.checked .trait-name { color: #4a5160; text-decoration: line-through; }
+ 
+.trait-checkbox {
+    width: 18px; height: 18px; flex-shrink: 0;
+    appearance: none; -webkit-appearance: none;
+    border: 2px solid #2a2d3a; border-radius: 4px;
+    background: transparent; cursor: pointer;
+    position: relative; transition: border-color 0.15s, background 0.15s;
+}
+.trait-checkbox:checked { background: #00c853; border-color: #00c853; }
+.trait-checkbox:checked::after {
+    content: '✓'; position: absolute; top: -1px; left: 2px;
+    font-size: 11px; color: #13151a; font-weight: 700;
+}
+ 
+.trait-name { flex: 1; font-size: 0.875rem; }
+ 
+.cat-badge {
+    font-size: 0.65rem; padding: 0.15rem 0.5rem;
+    border-radius: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+}
+.cat-badge.body   { background: rgba(255,107,53,0.15); color: #ff6b35; }
+.cat-badge.mind   { background: rgba(0,229,255,0.12);  color: #00e5ff; }
+.cat-badge.wealth { background: rgba(255,215,0,0.12);  color: #ffd700; }
+.cat-badge.social { background: rgba(124,77,255,0.15); color: #7c4dff; }
+ 
+.streak-badge {
+    display: flex; align-items: center; gap: 0.25rem;
+    font-size: 0.78rem; color: #4a5160; flex-shrink: 0; min-width: 36px;
+}
+.streak-badge.warm { color: #ff6b35; }
+.streak-badge.gold { color: #ffd700; }
+ 
+.already-badge {
+    font-size: 0.65rem; color: #4a5160; flex-shrink: 0;
+    border: 1px solid #2a2d3a; border-radius: 10px; padding: 0.1rem 0.45rem;
+}
+ 
+.xp-float {
+    position: fixed; pointer-events: none; z-index: 9999;
+    font-size: 0.85rem; font-weight: 700; color: #ffd700;
+    animation: floatUp 1s ease-out forwards;
+}
+@keyframes floatUp {
+    0%   { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-48px); }
+}
+ 
+.back-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.8rem; color: #4a5160; text-decoration: none;
+    margin-bottom: 1rem; transition: color 0.15s;
+}
+.back-link:hover { color: #00e5ff; }
+{% endblock %}
+ 
+{% block content %}
+<a href="{{ url_for('main.index') }}" class="back-link">← Dashboard</a>
+ 
+<div class="roadmap-header">
+    <div>
+        <h1>⚔️ Warrior Roadmap</h1>
+        <div class="roadmap-date">{{ today }}</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+        <div class="roadmap-today-xp" id="today-xp-display">
+            +{{ today_xp }} XP <span>today</span>
+        </div>
+        <div class="category-summary">
+            {% for cat, total in category_totals.items() %}
+            <div class="cat-pill">
+                {{ cat|capitalize }} <b id="cat-count-{{ cat }}">{{ category_counts.get(cat, 0) }}</b>/{{ total }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+ 
+{% for layer in layers %}
+<div class="layer-section">
+    <button class="layer-toggle {% if loop.first %}open{% endif %}" onclick="toggleLayer({{ layer.id }}, this)">
+        <span>{{ layer.name }}</span>
+        <span class="layer-meta">
+            {{ layer.traits | selectattr('checked_today') | list | length }}/{{ layer.traits | length }} done
+        </span>
+    </button>
+    <div class="layer-body {% if loop.first %}open{% endif %}" id="layer-body-{{ layer.id }}">
+        {% for trait in layer.traits %}
+        <div class="trait-row {% if trait.checked_today %}checked{% endif %}" id="row-{{ trait.slug }}">
+            <input
+                type="checkbox"
+                class="trait-checkbox"
+                id="chk-{{ trait.slug }}"
+                {% if trait.checked_today %}checked{% endif %}
+                onchange="handleCheck('{{ trait.slug }}', this)"
+            >
+            <label for="chk-{{ trait.slug }}" class="trait-name">{{ trait.name }}</label>
+            <span class="cat-badge {{ trait.category }}">{{ trait.category }}</span>
+            <span class="streak-badge {% if trait.streak >= 30 %}gold{% elif trait.streak >= 7 %}warm{% endif %}"
+                  id="streak-{{ trait.slug }}">
+                {% if trait.streak >= 7 %}🔥{% else %}○{% endif %} {{ trait.streak }}
+            </span>
+            {% if trait.already_counted %}
+            <span class="already-badge" title="Already counted via main dashboard">counted</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+ 
+{% block extra_scripts %}
+let todayXp = {{ today_xp }};
+ 
+function toggleLayer(id, btn) {
+    const body = document.getElementById('layer-body-' + id);
+    body.classList.toggle('open');
+    btn.classList.toggle('open');
+}
+ 
+function handleCheck(slug, checkbox) {
+    const url = checkbox.checked ? `/roadmap/check/${slug}` : `/roadmap/uncheck/${slug}`;
+    fetch(url, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            const row = document.getElementById('row-' + slug);
+            if (data.checked) {
+                row.classList.add('checked');
+                if (data.xp_awarded > 0) {
+                    showXpFloat(checkbox, '+' + data.xp_awarded + ' XP');
+                    todayXp += data.xp_awarded;
+                    document.getElementById('today-xp-display').innerHTML =
+                        '+' + todayXp + ' XP <span>today</span>';
+                }
+                updateStreak(slug, data.streak);
+            } else {
+                row.classList.remove('checked');
+            }
+        })
+        .catch(() => { checkbox.checked = !checkbox.checked; });
+}
+ 
+function updateStreak(slug, streak) {
+    const el = document.getElementById('streak-' + slug);
+    if (!el) return;
+    el.textContent = (streak >= 7 ? '🔥' : '○') + ' ' + streak;
+    el.className = 'streak-badge' + (streak >= 30 ? ' gold' : streak >= 7 ? ' warm' : '');
+}
+ 
+function showXpFloat(anchor, text) {
+    const rect = anchor.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.className = 'xp-float';
+    el.textContent = text;
+    el.style.left = (rect.left + window.scrollX) + 'px';
+    el.style.top  = (rect.top  + window.scrollY - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+}
+{% endblock %}

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-
-
-
+ 
+ 
+ 
 {% block content %}
-
+ 
     <!-- ── Header ── -->
     <header class="dashboard-header">
         <h1><span class="header-emoji">⚔️</span> WARRIOR DASHBOARD</h1>
@@ -15,7 +15,7 @@
             </div>
         </div>
     </header>
-
+ 
     <!-- ── Flash Messages ── -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -24,13 +24,13 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-
+ 
     {% include 'partials/character_overview.html' %}
-
+ 
     <!-- ══ HORIZONTAL MEGA NAV ══ -->
     <nav class="nav-bar">
         <div class="nav-inner">
-
+ 
             <div class="nav-group">
                 <button class="nav-group-btn has-active">Daily <span class="caret">▼</span></button>
                 <div class="nav-dropdown-panel">
@@ -39,7 +39,7 @@
                     <button class="nav-item" onclick="showTab('challenge', this)">⚡ Daily Challenge</button>
                 </div>
             </div>
-
+ 
             <div class="nav-group">
                 <button class="nav-group-btn">Fitness <span class="caret">▼</span></button>
                 <div class="nav-dropdown-panel">
@@ -47,7 +47,7 @@
                     <button class="nav-item" onclick="showTab('records', this)">🏋️ Personal Records</button>
                 </div>
             </div>
-
+ 
             <div class="nav-group">
                 <button class="nav-group-btn">Mind <span class="caret">▼</span></button>
                 <div class="nav-dropdown-panel">
@@ -55,7 +55,7 @@
                     <button class="nav-item" onclick="showTab('notes', this)">📝 Notes & Plans</button>
                 </div>
             </div>
-
+ 
             <div class="nav-group">
                 <button class="nav-group-btn">Progress <span class="caret">▼</span></button>
                 <div class="nav-dropdown-panel">
@@ -64,7 +64,7 @@
                     <button class="nav-item" onclick="showTab('history', this)">📜 History</button>
                 </div>
             </div>
-
+ 
             <div class="nav-group">
                 <button class="nav-group-btn">Rewards <span class="caret">▼</span></button>
                 <div class="nav-dropdown-panel">
@@ -72,7 +72,7 @@
                     <button class="nav-item" onclick="showTab('achievements', this)">🏆 Achievements</button>
                 </div>
             </div>
-
+ 
             <div class="nav-group">
                 <button class="nav-group-btn">Life <span class="caret">▼</span></button>
                 <div class="nav-dropdown-panel">
@@ -80,10 +80,12 @@
                     <button class="nav-item" onclick="showTab('nemesis', this)">😈 Nemesis Mode</button>
                 </div>
             </div>
-
+ 
+            <a href="{{ url_for('roadmap.index') }}" class="nav-group-btn" style="text-decoration:none;">🗺️ Roadmap</a>
+ 
         </div>
     </nav>
-
+ 
     <!-- ══ TAB PANES ══ -->
     {% include 'partials/tab_quest.html' %}
     {% include 'partials/tab_streaks.html' %}
@@ -101,5 +103,5 @@
     {% include 'partials/tab_ghost_data.html' %}
     {% include 'partials/modal_log_activity.html' %}
     {% include 'partials/profile.html'%}
-
+ 
 {% endblock %}
