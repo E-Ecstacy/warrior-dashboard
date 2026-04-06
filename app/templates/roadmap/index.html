@@ -6,107 +6,86 @@
 .roadmap-header {
     display: flex; align-items: flex-start; justify-content: space-between;
     flex-wrap: wrap; gap: 1rem;
-    padding: 1.25rem 0 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 1.5rem 0 1.75rem;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 1.5rem;
 }
 .roadmap-header h1 {
-    font-family: 'Merriweather', Georgia, serif;
-    font-size: 1.45rem; font-weight: 900; letter-spacing: 1px;
-    -webkit-text-stroke: 1.5px #008b8b;
-    color: #ffffff; paint-order: stroke fill; line-height: 1;
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 1.4rem; font-weight: 400;
+    color: var(--text); line-height: 1;
+    -webkit-text-stroke: 0; paint-order: unset;
 }
-.roadmap-date { font-size: 0.78rem; color: #4a5160; margin-top: 0.3rem; }
-.roadmap-today-xp { font-size: 1.1rem; font-weight: 700; color: #ffd700; white-space: nowrap; }
-.roadmap-today-xp span { font-size: 0.75rem; color: #4a5160; font-weight: 400; margin-left: 0.3rem; }
+.roadmap-date { font-size: 0.75rem; color: var(--text-3); margin-top: 0.3rem; }
+.roadmap-today-xp { font-size: 1rem; font-weight: 600; color: var(--amber); white-space: nowrap; }
+.roadmap-today-xp span { font-size: 0.72rem; color: var(--text-3); font-weight: 400; margin-left: 0.3rem; }
  
-.category-summary { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
-.cat-pill {
-    background: #1a1d26; border: 1px solid #1e2130;
-    border-radius: 20px; padding: 0.25rem 0.75rem;
-    font-size: 0.75rem; color: #6a7180;
-}
-.cat-pill b { color: #c8d0de; }
+.category-summary { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.cat-pill { background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; padding: 0.2rem 0.65rem; font-size: 0.72rem; color: var(--text-3); }
+.cat-pill b { color: var(--text-2); }
  
-.layer-section { margin-bottom: 1rem; }
+.layer-section { margin-bottom: 0.75rem; }
 .layer-toggle {
-    width: 100%; background: #1a1d26; border: 1px solid #1e2130;
-    border-radius: 8px; padding: 0.75rem 1rem;
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.7rem 1rem;
     display: flex; justify-content: space-between; align-items: center;
-    cursor: pointer; color: #c8d0de; font-weight: 600; font-size: 0.9rem;
-    transition: border-color 0.15s;
+    cursor: pointer; color: var(--text-2); font-weight: 500; font-size: 0.85rem;
+    font-family: 'DM Sans', sans-serif; transition: border-color 0.15s;
 }
-.layer-toggle:hover { border-color: rgba(0,229,255,0.2); }
-.layer-toggle .layer-meta { font-size: 0.72rem; color: #4a5160; font-weight: 400; }
+.layer-toggle:hover { border-color: var(--border-2); color: var(--text); }
+.layer-toggle .layer-meta { font-size: 0.7rem; color: var(--text-3); font-weight: 400; }
 .layer-toggle.open .layer-meta::after { content: ' ▲'; }
 .layer-toggle:not(.open) .layer-meta::after { content: ' ▼'; }
  
-.layer-body { display: none; padding: 0.5rem 0 0; }
+.layer-body { display: none; padding: 0.4rem 0 0; }
 .layer-body.open { display: block; }
  
 .trait-row {
     display: flex; align-items: center; gap: 0.75rem;
-    background: #1a1d26; border: 1px solid #1e2130;
-    border-radius: 8px; padding: 0.65rem 1rem;
-    margin-bottom: 0.35rem;
-    transition: border-color 0.15s;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0.6rem 1rem;
+    margin-bottom: 0.3rem; transition: border-color 0.15s;
 }
-.trait-row.checked { border-color: rgba(0,200,83,0.25); }
-.trait-row.checked .trait-name { color: #4a5160; text-decoration: line-through; }
+.trait-row.checked { border-color: rgba(76,175,125,0.2); }
+.trait-row.checked .trait-name { color: var(--text-3); text-decoration: line-through; }
  
 .trait-checkbox {
-    width: 18px; height: 18px; flex-shrink: 0;
+    width: 15px; height: 15px; flex-shrink: 0;
     appearance: none; -webkit-appearance: none;
-    border: 2px solid #2a2d3a; border-radius: 4px;
+    border: 1px solid var(--border-2); border-radius: 3px;
     background: transparent; cursor: pointer;
     position: relative; transition: border-color 0.15s, background 0.15s;
 }
-.trait-checkbox:checked { background: #00c853; border-color: #00c853; }
+.trait-checkbox:checked { background: var(--green); border-color: var(--green); }
 .trait-checkbox:checked::after {
     content: '✓'; position: absolute; top: -1px; left: 2px;
-    font-size: 11px; color: #13151a; font-weight: 700;
+    font-size: 10px; color: var(--bg); font-weight: 700;
 }
  
-.trait-name { flex: 1; font-size: 0.875rem; }
+.trait-name { flex: 1; font-size: 0.83rem; color: var(--text-2); }
  
 .cat-badge {
-    font-size: 0.65rem; padding: 0.15rem 0.5rem;
-    border-radius: 10px; font-weight: 600;
+    font-size: 0.62rem; padding: 0.1rem 0.45rem;
+    border-radius: 20px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+    border: 1px solid transparent;
 }
-.cat-badge.body   { background: rgba(255,107,53,0.15); color: #ff6b35; }
-.cat-badge.mind   { background: rgba(0,229,255,0.12);  color: #00e5ff; }
-.cat-badge.wealth { background: rgba(255,215,0,0.12);  color: #ffd700; }
-.cat-badge.social { background: rgba(124,77,255,0.15); color: #7c4dff; }
+.cat-badge.body   { background: rgba(224,92,92,0.1);   color: #e05c5c;      border-color: rgba(224,92,92,0.2); }
+.cat-badge.mind   { background: rgba(92,158,224,0.1);  color: #5c9ee0;      border-color: rgba(92,158,224,0.2); }
+.cat-badge.wealth { background: rgba(212,168,67,0.1);  color: var(--amber); border-color: rgba(212,168,67,0.2); }
+.cat-badge.social { background: rgba(76,175,125,0.1);  color: var(--green); border-color: rgba(76,175,125,0.2); }
  
-.streak-badge {
-    display: flex; align-items: center; gap: 0.25rem;
-    font-size: 0.78rem; color: #4a5160; flex-shrink: 0; min-width: 36px;
-}
-.streak-badge.warm { color: #ff6b35; }
-.streak-badge.gold { color: #ffd700; }
+.streak-badge { display: flex; align-items: center; gap: 0.2rem; font-size: 0.75rem; color: var(--text-3); flex-shrink: 0; min-width: 32px; }
+.streak-badge.warm { color: #e05c5c; }
+.streak-badge.gold { color: var(--amber); }
  
-.already-badge {
-    font-size: 0.65rem; color: #4a5160; flex-shrink: 0;
-    border: 1px solid #2a2d3a; border-radius: 10px; padding: 0.1rem 0.45rem;
-}
+.already-badge { font-size: 0.62rem; color: var(--text-3); flex-shrink: 0; border: 1px solid var(--border); border-radius: 20px; padding: 0.1rem 0.4rem; }
  
-.xp-float {
-    position: fixed; pointer-events: none; z-index: 9999;
-    font-size: 0.85rem; font-weight: 700; color: #ffd700;
-    animation: floatUp 1s ease-out forwards;
-}
-@keyframes floatUp {
-    0%   { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-48px); }
-}
+.xp-float { position: fixed; pointer-events: none; z-index: 9999; font-size: 0.82rem; font-weight: 600; color: var(--amber); animation: floatUp 1s ease-out forwards; }
+@keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-48px); } }
  
-.back-link {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    font-size: 0.8rem; color: #4a5160; text-decoration: none;
-    margin-bottom: 1rem; transition: color 0.15s;
-}
-.back-link:hover { color: #00e5ff; }
+.back-link { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-3); text-decoration: none; margin-bottom: 1.25rem; transition: color 0.15s; }
+.back-link:hover { color: var(--text); }
 {% endblock %}
  
 {% block content %}
@@ -142,13 +121,9 @@
     <div class="layer-body {% if loop.first %}open{% endif %}" id="layer-body-{{ layer.id }}">
         {% for trait in layer.traits %}
         <div class="trait-row {% if trait.checked_today %}checked{% endif %}" id="row-{{ trait.slug }}">
-            <input
-                type="checkbox"
-                class="trait-checkbox"
-                id="chk-{{ trait.slug }}"
+            <input type="checkbox" class="trait-checkbox" id="chk-{{ trait.slug }}"
                 {% if trait.checked_today %}checked{% endif %}
-                onchange="handleCheck('{{ trait.slug }}', this)"
-            >
+                onchange="handleCheck('{{ trait.slug }}', this)">
             <label for="chk-{{ trait.slug }}" class="trait-name">{{ trait.name }}</label>
             <span class="cat-badge {{ trait.category }}">{{ trait.category }}</span>
             <span class="streak-badge {% if trait.streak >= 30 %}gold{% elif trait.streak >= 7 %}warm{% endif %}"
@@ -183,7 +158,8 @@ function handleCheck(slug, checkbox) {
             if (data.checked) {
                 row.classList.add('checked');
                 if (data.xp_awarded > 0) {
-                    showXpFloat(checkbox, '+' + data.xp_awarded + ' XP');
+                    checkbox.dataset.xpAwarded = data.xp_awarded;
+                    showXpFloat('+' + data.xp_awarded + ' XP');
                     todayXp += data.xp_awarded;
                     document.getElementById('today-xp-display').innerHTML =
                         '+' + todayXp + ' XP <span>today</span>';
@@ -191,6 +167,11 @@ function handleCheck(slug, checkbox) {
                 updateStreak(slug, data.streak);
             } else {
                 row.classList.remove('checked');
+                const previousXp = parseInt(checkbox.dataset.xpAwarded || 0);
+                todayXp -= previousXp;
+                checkbox.dataset.xpAwarded = 0;
+                document.getElementById('today-xp-display').innerHTML =
+                    '+' + todayXp + ' XP <span>today</span>';
             }
         })
         .catch(() => { checkbox.checked = !checkbox.checked; });
@@ -203,13 +184,12 @@ function updateStreak(slug, streak) {
     el.className = 'streak-badge' + (streak >= 30 ? ' gold' : streak >= 7 ? ' warm' : '');
 }
  
-function showXpFloat(anchor, text) {
-    const rect = anchor.getBoundingClientRect();
+function showXpFloat(text) {
     const el = document.createElement('div');
     el.className = 'xp-float';
     el.textContent = text;
-    el.style.left = (rect.left + window.scrollX) + 'px';
-    el.style.top  = (rect.top  + window.scrollY - 10) + 'px';
+    el.style.top = '80px';
+    el.style.right = '20px';
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 1000);
 }

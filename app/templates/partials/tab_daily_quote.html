@@ -1,0 +1,111 @@
+<div id="daily-quote-section" style="
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+">
+    <p class="label" style="margin-bottom: 1.25rem;">Quote of the Day</p>
+    <div style="
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--amber);
+        border-radius: var(--radius);
+        padding: 1.75rem 2rem;
+    ">
+        <p id="quote-text" style="
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        "></p>
+        <p id="quote-author" style="
+            font-size: 0.75rem;
+            color: var(--text-3);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        "></p>
+    </div>
+</div>
+ 
+<script>
+(function () {
+    const quotes = [
+        { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
+        { text: "The man who moves a mountain begins by carrying away small stones.", author: "Confucius" },
+        { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+        { text: "Hard choices, easy life. Easy choices, hard life.", author: "Jerzy Gregorek" },
+        { text: "You have power over your mind, not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },
+        { text: "The impediment to action advances action. What stands in the way becomes the way.", author: "Marcus Aurelius" },
+        { text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius" },
+        { text: "Dwell on the beauty of life. Watch the stars, and see yourself running with them.", author: "Marcus Aurelius" },
+        { text: "If it is not right, do not do it; if it is not true, do not say it.", author: "Marcus Aurelius" },
+        { text: "The first and greatest victory is to conquer yourself.", author: "Plato" },
+        { text: "No man is free who is not master of himself.", author: "Epictetus" },
+        { text: "Make the best use of what is in your power, and take the rest as it happens.", author: "Epictetus" },
+        { text: "Seek not the good in external things; seek it in yourself.", author: "Epictetus" },
+        { text: "He who is not courageous enough to take risks will accomplish nothing in life.", author: "Muhammad Ali" },
+        { text: "I hated every minute of training, but I said, don't quit. Suffer now and live the rest of your life as a champion.", author: "Muhammad Ali" },
+        { text: "A year from now you may wish you had started today.", author: "Karen Lamb" },
+        { text: "Success is nothing more than a few simple disciplines practised every day.", author: "Jim Rohn" },
+        { text: "Either you run the day or the day runs you.", author: "Jim Rohn" },
+        { text: "Formal education will make you a living; self-education will make you a fortune.", author: "Jim Rohn" },
+        { text: "Work harder on yourself than you do on your job.", author: "Jim Rohn" },
+        { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+        { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
+        { text: "Your time is limited, so don't waste it living someone else's life.", author: "Steve Jobs" },
+        { text: "Be the change you wish to see in the world.", author: "Mahatma Gandhi" },
+        { text: "Strength does not come from physical capacity. It comes from an indomitable will.", author: "Mahatma Gandhi" },
+        { text: "Pain is temporary. Quitting lasts forever.", author: "Lance Armstrong" },
+        { text: "Champions aren't made in the gyms. Champions are made from something they have deep inside them — a desire, a dream, a vision.", author: "Muhammad Ali" },
+        { text: "The successful warrior is the average man, with laser-like focus.", author: "Bruce Lee" },
+        { text: "Knowing is not enough, we must apply. Willing is not enough, we must do.", author: "Bruce Lee" },
+        { text: "Absorb what is useful, discard what is useless, and add what is specifically your own.", author: "Bruce Lee" },
+        { text: "Do not pray for an easy life. Pray for the strength to endure a difficult one.", author: "Bruce Lee" },
+        { text: "The more you sweat in training, the less you bleed in combat.", author: "Richard Marcinko" },
+        { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
+        { text: "Don't count the days, make the days count.", author: "Muhammad Ali" },
+        { text: "The difference between a successful person and others is not a lack of strength, not a lack of knowledge, but rather a lack of will.", author: "Vince Lombardi" },
+        { text: "All our dreams can come true if we have the courage to pursue them.", author: "Walt Disney" },
+        { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+        { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
+        { text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford" },
+        { text: "The only limit to our realization of tomorrow is our doubts of today.", author: "Franklin D. Roosevelt" },
+        { text: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein" },
+        { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+        { text: "The journey of a thousand miles begins with one step.", author: "Lao Tzu" },
+        { text: "That which does not kill us makes us stronger.", author: "Friedrich Nietzsche" },
+        { text: "He who has a why to live can bear almost any how.", author: "Friedrich Nietzsche" },
+        { text: "To live is the rarest thing in the world. Most people exist, that is all.", author: "Oscar Wilde" },
+        { text: "You only live once, but if you do it right, once is enough.", author: "Mae West" },
+        { text: "In three words I can sum up everything I've learned about life: it goes on.", author: "Robert Frost" },
+        { text: "To be yourself in a world that is constantly trying to make you something else is the greatest accomplishment.", author: "Ralph Waldo Emerson" },
+        { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
+        { text: "Do one thing every day that scares you.", author: "Eleanor Roosevelt" },
+        { text: "With the new day comes new strength and new thoughts.", author: "Eleanor Roosevelt" },
+        { text: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" },
+        { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+        { text: "Nothing in life is to be feared, it is only to be understood.", author: "Marie Curie" },
+        { text: "I am not a product of my circumstances. I am a product of my decisions.", author: "Stephen Covey" },
+        { text: "We must not allow the clock and the calendar to blind us to the fact that each moment of life is a miracle and mystery.", author: "H.G. Wells" },
+        { text: "The mind is everything. What you think you become.", author: "Buddha" },
+        { text: "Three things cannot be long hidden: the sun, the moon, and the truth.", author: "Buddha" },
+        { text: "Health is the greatest gift, contentment the greatest wealth, faithfulness the best relationship.", author: "Buddha" },
+        { text: "Each morning we are born again. What we do today is what matters most.", author: "Buddha" },
+        { text: "Victory is always possible for the person who refuses to stop fighting.", author: "Napoleon Hill" },
+        { text: "Whatever the mind can conceive and believe, it can achieve.", author: "Napoleon Hill" },
+        { text: "Great achievement is usually born of great sacrifice, and is never the result of selfishness.", author: "Napoleon Hill" },
+        { text: "First say to yourself what you would be; and then do what you have to do.", author: "Epictetus" },
+    ];
+ 
+    // Pick quote based on day of year — changes every midnight, same for all users
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor((now - start) / 86400000);
+    const quote = quotes[dayOfYear % quotes.length];
+ 
+    document.getElementById('quote-text').textContent = '\u201C' + quote.text + '\u201D';
+    document.getElementById('quote-author').textContent = '— ' + quote.author;
+})();
+</script>
