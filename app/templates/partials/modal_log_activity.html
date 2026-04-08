@@ -1,205 +1,181 @@
-<div id="log-modal" class="modal">
-    <div class="modal-content" style="
-        max-width: 560px;
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    ">
-        <!-- Sticky header — fully opaque so content scrolling behind is hidden -->
-        <div style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: var(--surface);
-            flex-shrink: 0;
-        ">
-            <h2 style="margin:0; font-size:1rem; font-family:'DM Sans',sans-serif; font-weight:600; color:var(--text);">
-                📝 Log Today's Activities
-            </h2>
-            <button class="btn btn-sm" onclick="hideModal('log-modal')" style="padding:0.25rem 0.6rem; font-size:1rem; line-height:1;">×</button>
+<div id="tab-analytics" class="tab-pane">
+    {% if analytics.total_days > 0 %}
+ 
+        <!-- Stat summary row -->
+        <div class="analytics-grid" style="margin-bottom:1.5rem;">
+            <div class="analytics-stat">
+                <div class="big-number">{{ analytics.total_days }}</div>
+                <div class="label">Days Logged</div>
+            </div>
+            <div class="analytics-stat">
+                <div class="big-number">{{ analytics.average_points }}</div>
+                <div class="label">Avg / Day</div>
+            </div>
+            <div class="analytics-stat">
+                <div class="big-number" style="color:#00c853;">{{ analytics.best_day }}</div>
+                <div class="label">Best Day</div>
+            </div>
+            <div class="analytics-stat">
+                <div class="big-number" style="color:#ff5370;">{{ analytics.worst_day }}</div>
+                <div class="label">Worst Day</div>
+            </div>
         </div>
  
-        <!-- Scrollable body -->
-        <form method="POST" action="{{ url_for('main.log_activity') }}" style="
-            overflow-y: auto;
-            padding: 1.25rem 1.5rem;
-            flex: 1;
-            -webkit-overflow-scrolling: touch;
-        ">
-            <!-- Date -->
-            <div style="margin-bottom:1.25rem;">
-                <label>Date</label>
-                <input type="date" name="log_date" value="{{ now.strftime('%Y-%m-%d') }}" max="{{ now.strftime('%Y-%m-%d') }}" style="width:auto;">
+        <div class="grid-2" style="margin-bottom:1.5rem;align-items:start;">
+ 
+            <!-- ── Radar Chart ── -->
+            <div class="card">
+                <div class="section-title">STAT RADAR</div>
+                <div style="display:flex;justify-content:center;align-items:center;">
+                    <canvas id="radarChart" width="300" height="300"></canvas>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;justify-content:center;">
+                    {% for stat_name, color in [('body','#E8593C'),('mind','#7C4DFF'),('soul','#2EA87E')] %}
+                    <span style="font-size:0.72rem;color:{{ color }};display:flex;align-items:center;gap:0.3rem;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:{{ color }};display:inline-block;"></span>
+                        {{ stat_name.title() }} Lv.{{ stats[stat_name]['level'] }}
+                    </span>
+                    {% endfor %}
+                </div>
             </div>
  
-            <!-- Tier 1 -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem;">🏆 Tier 1 — Foundation</p>
-                <label class="activity-item">
-                    <input type="checkbox" name="tier1_complete">
-                    <span>Complete all 4 core activities</span>
-                    <span style="color:var(--amber); font-size:0.78rem; flex-shrink:0;">+20p</span>
-                </label>
+            <!-- ── Top Activities ── -->
+            <div class="card">
+                <div class="section-title">TOP ACTIVITIES</div>
+                {% if analytics.top_activities %}
+                {% set max_count = analytics.top_activities[0][1] if analytics.top_activities else 1 %}
+                {% for activity, count in analytics.top_activities %}
+                <div class="activity-bar">
+                    <div class="activity-bar-label">{{ activity.replace('_',' ').title() }}</div>
+                    <div class="activity-bar-track">
+                        <div class="activity-bar-fill" style="width:{{ (count / max_count * 100)|int }}%"></div>
+                    </div>
+                    <div class="activity-bar-count">{{ count }}×</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color:#4a5160;font-size:0.85rem;">No activity data yet.</p>
+                {% endif %}
             </div>
  
-            <!-- Physical -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:#e05c5c;">⚔️ Physical</p>
-                {% set physical = [
-                    ('full_workout','Full Workout 30min',25),
-                    ('light_exercise','Light Exercise 15min',12),
-                    ('push_ups_100','100 Push-ups',20),
-                    ('steps_10k','10k Steps',8),
-                    ('stretching','Stretching 10min',5),
-                    ('cold_shower','Cold Shower',3),
-                ] %}
-                {% for name, label, pts in physical %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--text-3); font-size:0.78rem; flex-shrink:0;">+{{ pts }}p</span>
-                </label>
+        </div>
+ 
+        <!-- ── Weekly Trend ── -->
+        {% if analytics.weekly_trend %}
+        <div class="card">
+            <div class="section-title">WEEKLY TREND</div>
+            <div style="display:grid;grid-template-columns:repeat({{ analytics.weekly_trend|length }},1fr);gap:0.75rem;margin-top:0.5rem;">
+                {% for week in analytics.weekly_trend %}
+                {% set week_num = loop.index %}
+                <div style="text-align:center;">
+                    <div style="font-size:0.68rem;color:#4a5160;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:1px;">
+                        Week {{ week_num }}
+                    </div>
+                    {% set bar_pct = [((week.points / (analytics.best_day * 7)) * 100)|int, 100]|min if analytics.best_day else 0 %}
+                    <div style="height:60px;background:#23262f;border-radius:3px;position:relative;overflow:hidden;">
+                        <div style="position:absolute;bottom:0;left:0;right:0;height:{{ bar_pct }}%;background:linear-gradient(180deg,#00e5ff,#7c4dff);border-radius:3px;transition:height 0.4s;"></div>
+                    </div>
+                    <div style="font-size:0.88rem;font-weight:600;color:#e0e6f0;margin-top:0.4rem;">{{ week.points }}</div>
+                    <div style="font-size:0.68rem;color:#4a5160;">{{ week.avg }}/day</div>
+                </div>
                 {% endfor %}
             </div>
+        </div>
+        {% endif %}
  
-            <!-- Mental -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:#5c9ee0;">🧠 Mental</p>
-                {% set mental = [
-                    ('deep_work','Deep Work Session',20),
-                    ('study_pomodoro','Study Pomodoro',8),
-                    ('read_book','Read Book 30min',10),
-                    ('online_course','Online Course',12),
-                    ('code_practice','Code Practice',15),
-                    ('code_project','Code Project',20),
-                    ('project_dev','Project Dev',15),
-                    ('new_skill','Learn New Skill',10),
-                    ('journal','Journal / Reflect',5),
-                ] %}
-                {% for name, label, pts in mental %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--text-3); font-size:0.78rem; flex-shrink:0;">+{{ pts }}p</span>
-                </label>
-                {% endfor %}
-            </div>
- 
-            <!-- Discipline -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:#a07de0;">🛡️ Discipline</p>
-                {% set discipline = [
-                    ('screen_under_2h','Screen < 2h',15),
-                    ('screen_2_4h','Screen 2-4h',5),
-                    ('no_phone_morning','No Phone Morning',5),
-                    ('no_phone_night','No Phone Night',5),
-                    ('plan_tomorrow','Plan Tomorrow',3),
-                    ('organize_space','Organize Space',8),
-                ] %}
-                {% for name, label, pts in discipline %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--text-3); font-size:0.78rem; flex-shrink:0;">+{{ pts }}p</span>
-                </label>
-                {% endfor %}
-            </div>
- 
-            <!-- Energy -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:var(--amber);">⚡ Energy</p>
-                {% set energy = [
-                    ('meditation','Meditation 10min',8),
-                    ('gratitude','Gratitude',3),
-                    ('breathwork','Breathwork',4),
-                    ('nature_walk','Nature Walk',10),
-                ] %}
-                {% for name, label, pts in energy %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--text-3); font-size:0.78rem; flex-shrink:0;">+{{ pts }}p</span>
-                </label>
-                {% endfor %}
-            </div>
- 
-            <!-- Influence -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:var(--green);">👑 Influence</p>
-                {% set social = [
-                    ('meaningful_conversation','Meaningful Conversation',8),
-                    ('help_someone_code','Help Someone Code',10),
-                    ('call_family','Call Family',5),
-                    ('teach_someone','Teach Someone',6),
-                    ('group_activity','Group Activity',7),
-                    ('networking','Networking',6),
-                    ('quality_time','Quality Time',10),
-                ] %}
-                {% for name, label, pts in social %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--text-3); font-size:0.78rem; flex-shrink:0;">+{{ pts }}p</span>
-                </label>
-                {% endfor %}
-            </div>
- 
-            <!-- Tier 3 -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:#a07de0;">💎 Tier 3 — Boss Moves</p>
-                {% set tier3 = [
-                    ('flow_state_4h','4h+ Flow State Deep Work',80),
-                    ('zero_screens','Zero Screens All Day',100),
-                    ('complete_todo','Complete Entire Todo List',50),
-                    ('cold_exposure','Extended Cold Exposure',30),
-                    ('new_algorithm','Master New Algorithm',60),
-                    ('teach_code','Teach Code to Someone',40),
-                ] %}
-                {% for name, label, pts in tier3 %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--amber); font-size:0.78rem; flex-shrink:0;">+{{ pts }}p</span>
-                </label>
-                {% endfor %}
-            </div>
- 
-            <!-- Streaks -->
-            <div style="margin-bottom:1.25rem;">
-                <p class="label" style="margin-bottom:0.5rem; color:var(--amber);">🔥 Streaks — mark if maintained today</p>
-                {% set streaks = [
-                    ('no_porn','No Porn'),
-                    ('workout','Workout'),
-                    ('meditation','Meditation'),
-                    ('deep_work','Deep Work'),
-                    ('reading','Reading'),
-                    ('coding_practice','Coding Practice'),
-                    ('sleep_7h','Sleep 7h+'),
-                    ('morning_routine','Morning Routine'),
-                    ('no_doomscroll','No Doomscroll'),
-                    ('screen_time_under_2h','Screen < 2h'),
-                ] %}
-                {% for name, label in streaks %}
-                <label class="activity-item">
-                    <input type="checkbox" name="{{ name }}">
-                    <span>{{ label }}</span>
-                    <span style="color:var(--amber); flex-shrink:0;">🔥</span>
-                </label>
-                {% endfor %}
-            </div>
- 
-            <!-- Notes -->
-            <div style="margin-bottom:1.5rem;">
-                <label>Notes (optional)</label>
-                <textarea name="notes" rows="3" placeholder="Reflections, how did you feel today?" style="resize:vertical;"></textarea>
-            </div>
- 
-            <button type="submit" class="btn btn-primary" style="width:100%;">
-                ✅ Submit Quest
-            </button>
-        </form>
-    </div>
+    {% else %}
+        <div class="card" style="text-align:center;padding:3rem;">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
+            <p style="color:#4a5160;">Log activities for at least a few days to unlock analytics.</p>
+        </div>
+    {% endif %}
 </div>
+ 
+<script>
+(function () {
+    const STATS = [
+        { key: 'body', label: 'Body', color: '#E8593C', level: {{ stats['body']['level'] }} },
+        { key: 'mind', label: 'Mind', color: '#7C4DFF', level: {{ stats['mind']['level'] }} },
+        { key: 'soul', label: 'Soul', color: '#2EA87E', level: {{ stats['soul']['level'] }} },
+    ];
+ 
+    const canvas = document.getElementById('radarChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+ 
+    const cx = 150, cy = 150, r = 110;
+    const n      = STATS.length;
+    const values = STATS.map(s => s.level);
+    const colors = STATS.map(s => s.color);
+    const labels = STATS.map(s => s.label);
+    const maxVal = Math.max(...values, 5);
+ 
+    function pt(i, val) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        const frac  = val / maxVal;
+        return { x: cx + Math.cos(angle) * r * frac,
+                 y: cy + Math.sin(angle) * r * frac };
+    }
+    function ptFull(i, frac) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        return { x: cx + Math.cos(angle) * r * frac,
+                 y: cy + Math.sin(angle) * r * frac };
+    }
+ 
+    // Background grid rings
+    [0.2, 0.4, 0.6, 0.8, 1.0].forEach(frac => {
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+            const p = ptFull(i, frac);
+            i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = frac === 1.0 ? '#2a2d38' : '#23262f';
+        ctx.lineWidth   = frac === 1.0 ? 1.5 : 1;
+        ctx.stroke();
+    });
+ 
+    // Axis lines
+    for (let i = 0; i < n; i++) {
+        const p = ptFull(i, 1.0);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = '#23262f';
+        ctx.lineWidth   = 1;
+        ctx.stroke();
+    }
+ 
+    // Data polygon
+    ctx.beginPath();
+    values.forEach((v, i) => {
+        const p = pt(i, v);
+        i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+    ctx.fillStyle   = 'rgba(124,77,255,0.1)';
+    ctx.strokeStyle = 'rgba(124,77,255,0.5)';
+    ctx.lineWidth   = 1.5;
+    ctx.fill();
+    ctx.stroke();
+ 
+    // Data points — each in its own stat colour
+    values.forEach((v, i) => {
+        const p = pt(i, v);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+    });
+ 
+    // Labels
+    ctx.font         = '12px Inter, Segoe UI, sans-serif';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    labels.forEach((label, i) => {
+        const p = ptFull(i, 1.32);
+        ctx.fillStyle = colors[i];
+        ctx.fillText(label, p.x, p.y);
+    });
+})();
+</script>

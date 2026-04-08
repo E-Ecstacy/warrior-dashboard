@@ -24,22 +24,20 @@
         </div>
     </div>
  
-    <div class="grid-5">
-        {% for stat_name in ['strength','intellect','discipline','energy','influence'] %}
+    <div class="grid-3">
+        {% for stat_name, stat_icon, stat_color in [
+            ('body', '🔥', '#E8593C'),
+            ('mind', '⚡', '#7C4DFF'),
+            ('soul', '👑', '#2EA87E')
+        ] %}
         <div class="stat-card">
             <div class="stat-header">
-                <span class="stat-icon">
-                    {% if stat_name == 'strength' %}⚔️
-                    {% elif stat_name == 'intellect' %}🧠
-                    {% elif stat_name == 'discipline' %}🛡️
-                    {% elif stat_name == 'energy' %}⚡
-                    {% else %}👑{% endif %}
-                </span>
+                <span class="stat-icon">{{ stat_icon }}</span>
                 <h3>{{ stat_name.upper() }}</h3>
             </div>
             <div class="stat-level">Lv. {{ stats[stat_name]['level'] }}</div>
             <div class="stat-bar">
-                <div class="stat-bar-fill" style="width:{{ stats[stat_name]['progress'] }}%"></div>
+                <div class="stat-bar-fill" style="width:{{ stats[stat_name]['progress'] }}%;background:{{ stat_color }};"></div>
             </div>
             <div class="stat-xp">{{ stats[stat_name]['xp'] }} / {{ stats[stat_name]['xp_to_next'] }} XP</div>
         </div>

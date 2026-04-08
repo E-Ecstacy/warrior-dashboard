@@ -1,15 +1,15 @@
 // Warrior Dashboard - Frontend Logic
-
+ 
 // State
 let characterData = null;
 let streaksData = null;
-
+ 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
     setupEventListeners();
 });
-
+ 
 // Setup event listeners
 function setupEventListeners() {
     // Open quest modal
@@ -142,7 +142,7 @@ function setupEventListeners() {
         });
     });
 }
-
+ 
 // Setup accordion toggle functionality
 function setupAccordions() {
     const accordionHeaders = document.querySelectorAll('.accordion-header');
@@ -171,7 +171,7 @@ function setupAccordions() {
         });
     });
 }
-
+ 
 // Load dashboard data
 async function loadDashboard() {
     try {
@@ -224,7 +224,7 @@ async function loadDashboard() {
         alert('Error loading dashboard data. Please refresh the page.');
     }
 }
-
+ 
 // Update character display
 function updateCharacterDisplay() {
     // Main stats
@@ -233,18 +233,19 @@ function updateCharacterDisplay() {
     document.getElementById('week-points').textContent = characterData.current_week_points;
     
     // Individual stats
-    const stats = ['strength', 'intellect', 'discipline', 'energy', 'influence'];
+    const stats = ['body', 'mind', 'soul'];
     stats.forEach(stat => {
         const statData = characterData.stats[stat];
+        if (!statData) return;
         document.getElementById(`${stat}-level`).textContent = statData.level;
         document.getElementById(`${stat}-xp`).textContent = statData.xp;
         document.getElementById(`${stat}-next`).textContent = statData.xp_to_next;
-        
+ 
         const progress = (statData.xp / statData.xp_to_next) * 100;
         document.getElementById(`${stat}-progress`).style.width = `${progress}%`;
     });
 }
-
+ 
 // Update streaks display
 function updateStreaksDisplay() {
     const container = document.getElementById('streaks-container');
@@ -283,7 +284,7 @@ function updateStreaksDisplay() {
         container.appendChild(card);
     }
 }
-
+ 
 // Update achievements display
 function updateAchievementsDisplay(data) {
     const container = document.getElementById('achievements-container');
@@ -303,7 +304,7 @@ function updateAchievementsDisplay(data) {
         }
     });
 }
-
+ 
 function createAchievementCard(achievement, unlocked) {
     const card = document.createElement('div');
     card.className = `achievement-card ${unlocked ? 'unlocked' : 'locked'}`;
@@ -322,7 +323,7 @@ function createAchievementCard(achievement, unlocked) {
     
     return card;
 }
-
+ 
 // Update skill tree display
 function updateSkillTreeDisplay(data) {
     const container = document.getElementById('skill-tree-container');
@@ -343,7 +344,7 @@ function updateSkillTreeDisplay(data) {
         container.appendChild(card);
     });
 }
-
+ 
 function createSkillCard(skill, unlocked, availablePoints) {
     const card = document.createElement('div');
     const tier = skill.cost === 500 ? 'bronze' : skill.cost === 1000 ? 'silver' : 'gold';
@@ -365,7 +366,7 @@ function createSkillCard(skill, unlocked, availablePoints) {
     
     return card;
 }
-
+ 
 // Unlock skill
 async function unlockSkill(skillId) {
     if (!confirm('Are you sure you want to unlock this skill?')) {
@@ -390,7 +391,7 @@ async function unlockSkill(skillId) {
         alert('Error unlocking skill. Please try again.');
     }
 }
-
+ 
 // Load today's summary
 async function loadTodaySummary() {
     try {
@@ -412,7 +413,7 @@ async function loadTodaySummary() {
         console.error('Error loading today summary:', error);
     }
 }
-
+ 
 // Handle quest form submission
 async function handleQuestSubmit(e) {
     e.preventDefault();
@@ -527,7 +528,7 @@ async function handleQuestSubmit(e) {
         alert('Error submitting quest. Please check your connection.');
     }
 }
-
+ 
 // Show achievement popup
 function showAchievementPopup(achievements) {
     const popup = document.getElementById('achievement-popup');
@@ -553,7 +554,7 @@ function showAchievementPopup(achievements) {
         popup.style.display = 'none';
     });
 }
-
+ 
 // Show combo popup
 function showComboPopup(combos, totalBonus) {
     // Create combo notification element if it doesn't exist
@@ -617,12 +618,12 @@ function showComboPopup(combos, totalBonus) {
         comboNotif.style.display = 'none';
     });
 }
-
+ 
 // Helper: Get today's date in YYYY-MM-DD format
 function getTodayDate() {
     return new Date().toISOString().split('T')[0];
 }
-
+ 
 // Load and display personal records
 async function loadPersonalRecords() {
     try {
@@ -683,7 +684,7 @@ async function loadPersonalRecords() {
         console.error('Error loading personal records:', error);
     }
 }
-
+ 
 // Update volume display in PR form
 function updateVolumeDisplay() {
     const weight = parseFloat(document.getElementById('weight').value) || 0;
@@ -693,7 +694,7 @@ function updateVolumeDisplay() {
     const volume = weight * reps * sets;
     document.getElementById('volume-display').textContent = volume.toLocaleString();
 }
-
+ 
 // Handle PR form submission
 async function handlePRSubmit(e) {
     e.preventDefault();
@@ -744,7 +745,7 @@ async function handlePRSubmit(e) {
         alert('Error submitting PR. Please try again.');
     }
 }
-
+ 
 // Delete a PR
 async function deletePR(exerciseName) {
     if (!confirm(`Are you sure you want to delete the PR for "${exerciseName}"?`)) {
@@ -773,7 +774,7 @@ async function deletePR(exerciseName) {
         alert('Error deleting PR. Please try again.');
     }
 }
-
+ 
 // Load and display notes and plans
 async function loadNotes() {
     try {
@@ -878,7 +879,7 @@ async function loadNotes() {
         console.error('Error loading notes:', error);
     }
 }
-
+ 
 // Handle notes form submission
 async function handleNotesSubmit(e) {
     e.preventDefault();
@@ -928,7 +929,7 @@ async function handleNotesSubmit(e) {
         alert('Error saving. Please try again.');
     }
 }
-
+ 
 // Complete a plan
 async function completePlan(planId) {
     try {
@@ -949,7 +950,7 @@ async function completePlan(planId) {
         alert('Error completing plan. Please try again.');
     }
 }
-
+ 
 // Delete a note or plan
 async function deleteNote(id, type) {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) {
@@ -978,7 +979,7 @@ async function deleteNote(id, type) {
         alert('Error deleting. Please try again.');
     }
 }
-
+ 
 // Load daily challenge
 async function loadDailyChallenge() {
     try {
@@ -1014,7 +1015,7 @@ async function loadDailyChallenge() {
         console.error('Error loading daily challenge:', error);
     }
 }
-
+ 
 // Complete daily challenge
 async function completeDailyChallenge() {
     if (!confirm('Did you actually complete this challenge?')) {
@@ -1039,7 +1040,7 @@ async function completeDailyChallenge() {
         alert('Error completing challenge. Please try again.');
     }
 }
-
+ 
 // Load nemesis mode status
 async function loadNemesisMode() {
     try {
@@ -1092,7 +1093,7 @@ async function loadNemesisMode() {
         console.error('Error loading nemesis mode:', error);
     }
 }
-
+ 
 // Load ghost data
 async function loadGhostData() {
     try {
@@ -1150,7 +1151,7 @@ async function loadGhostData() {
         console.error('Error loading ghost data:', error);
     }
 }
-
+ 
 // Load analytics
 async function loadAnalytics() {
     try {
@@ -1249,7 +1250,7 @@ async function loadAnalytics() {
         console.error('Error loading analytics:', error);
     }
 }
-
+ 
 // Budget Functions
 async function loadBudget() {
     try {
@@ -1279,7 +1280,7 @@ async function loadBudget() {
         console.error('Error loading budget:', error);
     }
 }
-
+ 
 async function handleBudgetSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -1312,7 +1313,7 @@ async function handleBudgetSubmit(e) {
         alert('Error adding transaction. Please try again.');
     }
 }
-
+ 
 // Workout Functions  
 async function loadWorkouts() {
     try {
@@ -1335,7 +1336,7 @@ async function loadWorkouts() {
         console.error('Error loading workouts:', error);
     }
 }
-
+ 
 async function handleWorkoutSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -1370,8 +1371,8 @@ async function handleWorkoutSubmit(e) {
         alert('Error logging workout. Please try again.');
     }
 }
-
-
+ 
+ 
 // Programming Skill Tree Functions
 async function loadProgrammingSkills() {
     try {
@@ -1419,7 +1420,7 @@ async function loadProgrammingSkills() {
         console.error("Error:", error);
     }
 }
-
+ 
 async function handleProgrammingSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -1444,7 +1445,7 @@ async function handleProgrammingSubmit(e) {
             let msg = `🐍 +${result.xp_earned} XP | +${result.points_earned}p
 Level ${result.language_data.level}`;
             if (result.leveled_up) msg += `
-
+ 
 🎉 LEVEL UP!`;
             alert(msg);
             document.getElementById("programming-modal").style.display = "none";
@@ -1455,7 +1456,7 @@ Level ${result.language_data.level}`;
         console.error("Error:", error);
     }
 }
-
+ 
 // Navigation System
 function setupNavigation() {
     const navBtns = document.querySelectorAll('.nav-btn');
@@ -1480,10 +1481,10 @@ function setupNavigation() {
         });
     });
 }
-
+ 
 // Call setup on page load
 setupNavigation();
-
+ 
 // Load Daily Logs
 async function loadDailyLogs() {
     try {
@@ -1516,7 +1517,7 @@ async function loadDailyLogs() {
         console.error('Error loading logs:', error);
     }
 }
-
+ 
 // Add CSS for log cards
 const logStyles = document.createElement('style');
 logStyles.textContent = `
@@ -1527,27 +1528,27 @@ logStyles.textContent = `
     border-radius: 10px;
     border-left: 4px solid var(--accent-cyan);
 }
-
+ 
 .log-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
 }
-
+ 
 .log-points {
     color: var(--accent-gold);
     font-weight: bold;
     font-size: 1.2rem;
 }
-
+ 
 .log-details {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
     margin-top: 0.5rem;
 }
-
+ 
 .badge {
     padding: 0.3rem 0.8rem;
     background: rgba(0, 217, 255, 0.2);
@@ -1555,17 +1556,17 @@ logStyles.textContent = `
     font-size: 0.85rem;
     color: var(--accent-cyan);
 }
-
+ 
 .badge.combo {
     background: rgba(255, 214, 10, 0.2);
     color: var(--accent-gold);
 }
-
+ 
 .badge.bonus {
     background: rgba(255, 0, 110, 0.2);
     color: var(--accent-pink);
 }
-
+ 
 .log-notes {
     margin-top: 0.8rem;
     padding-top: 0.8rem;
@@ -1575,5 +1576,5 @@ logStyles.textContent = `
 }
 `;
 document.head.appendChild(logStyles);
-
+ 
 // Call load logs when logs section is opened

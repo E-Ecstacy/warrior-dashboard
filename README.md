@@ -19,7 +19,7 @@ Built by a 15-year-old in London. Started as vibe-coded spaghetti, refactored fr
 | Feature | What it does |
 |--------|-------------|
 | 🎯 Daily Quest | Log activities across 5 stat categories, earn points and XP |
-| 📊 Character Stats | Strength, Intellect, Discipline, Energy, Influence — each levels up independently |
+| 📊 Character Stats | Body, Mind and Soul — each levels up independently |
 | 🔥 Streaks | Per-habit streaks with XP multipliers at 7, 14, and 30 days |
 | 🗺️ Warrior Roadmap | 24-trait daily checklist grouped into Foundation, Identity, Skills, Body, Wealth |
 | ⚡ Daily Challenge | Random bonus challenge generated every day |

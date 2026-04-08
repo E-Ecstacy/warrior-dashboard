@@ -1,6 +1,6 @@
 <div id="tab-analytics" class="tab-pane">
     {% if analytics.total_days > 0 %}
-    
+ 
         <!-- Stat summary row -->
         <div class="analytics-grid" style="margin-bottom:1.5rem;">
             <div class="analytics-stat">
@@ -20,17 +20,17 @@
                 <div class="label">Worst Day</div>
             </div>
         </div>
-    
+ 
         <div class="grid-2" style="margin-bottom:1.5rem;align-items:start;">
-    
-            <!-- ── Spider / Radar Chart ── -->
+ 
+            <!-- ── Radar Chart ── -->
             <div class="card">
                 <div class="section-title">STAT RADAR</div>
                 <div style="display:flex;justify-content:center;align-items:center;">
                     <canvas id="radarChart" width="300" height="300"></canvas>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;justify-content:center;">
-                    {% for stat_name, color in [('strength','#ff6b6b'),('intellect','#4ecdc4'),('discipline','#a8b2ff'),('energy','#ffd700'),('influence','#ff9f43')] %}
+                    {% for stat_name, color in [('body','#E8593C'),('mind','#7C4DFF'),('soul','#2EA87E')] %}
                     <span style="font-size:0.72rem;color:{{ color }};display:flex;align-items:center;gap:0.3rem;">
                         <span style="width:8px;height:8px;border-radius:50%;background:{{ color }};display:inline-block;"></span>
                         {{ stat_name.title() }} Lv.{{ stats[stat_name]['level'] }}
@@ -38,7 +38,7 @@
                     {% endfor %}
                 </div>
             </div>
-    
+ 
             <!-- ── Top Activities ── -->
             <div class="card">
                 <div class="section-title">TOP ACTIVITIES</div>
@@ -57,9 +57,9 @@
                 <p style="color:#4a5160;font-size:0.85rem;">No activity data yet.</p>
                 {% endif %}
             </div>
-    
+ 
         </div>
-    
+ 
         <!-- ── Weekly Trend ── -->
         {% if analytics.weekly_trend %}
         <div class="card">
@@ -71,7 +71,6 @@
                     <div style="font-size:0.68rem;color:#4a5160;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:1px;">
                         Week {{ week_num }}
                     </div>
-                    <!-- Mini bar -->
                     {% set bar_pct = [((week.points / (analytics.best_day * 7)) * 100)|int, 100]|min if analytics.best_day else 0 %}
                     <div style="height:60px;background:#23262f;border-radius:3px;position:relative;overflow:hidden;">
                         <div style="position:absolute;bottom:0;left:0;right:0;height:{{ bar_pct }}%;background:linear-gradient(180deg,#00e5ff,#7c4dff);border-radius:3px;transition:height 0.4s;"></div>
@@ -83,108 +82,100 @@
             </div>
         </div>
         {% endif %}
-    
+ 
     {% else %}
         <div class="card" style="text-align:center;padding:3rem;">
             <div style="font-size:2rem;margin-bottom:0.75rem;">📊</div>
             <p style="color:#4a5160;">Log activities for at least a few days to unlock analytics.</p>
         </div>
     {% endif %}
-    </div>
-    
-    <script>
-    (function() {
-        // Stat levels from Jinja
-        const statLevels = {
-            strength:   {{ stats['strength']['level'] }},
-            intellect:  {{ stats['intellect']['level'] }},
-            discipline: {{ stats['discipline']['level'] }},
-            energy:     {{ stats['energy']['level'] }},
-            influence:  {{ stats['influence']['level'] }},
-        };
-        const labels  = ['Strength', 'Intellect', 'Discipline', 'Energy', 'Influence'];
-        const values  = [statLevels.strength, statLevels.intellect, statLevels.discipline, statLevels.energy, statLevels.influence];
-        const colors  = ['#ff6b6b', '#4ecdc4', '#a8b2ff', '#ffd700', '#ff9f43'];
-        const maxVal  = Math.max(...values, 5); // at least 5 so new users see a shape
-    
-        const canvas  = document.getElementById('radarChart');
-        if (!canvas) return;
-        const ctx     = canvas.getContext('2d');
-        const cx = 150, cy = 150, r = 110;
-        const n = labels.length;
-    
-        function pt(i, val) {
-            const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-            const frac  = val / maxVal;
-            return {
-                x: cx + Math.cos(angle) * r * frac,
-                y: cy + Math.sin(angle) * r * frac
-            };
-        }
-        function ptFull(i, frac) {
-            const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
-            return {
-                x: cx + Math.cos(angle) * r * frac,
-                y: cy + Math.sin(angle) * r * frac
-            };
-        }
-    
-        // Background grid rings
-        const rings = [0.2, 0.4, 0.6, 0.8, 1.0];
-        rings.forEach(frac => {
-            ctx.beginPath();
-            for (let i = 0; i < n; i++) {
-                const p = ptFull(i, frac);
-                i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
-            }
-            ctx.closePath();
-            ctx.strokeStyle = frac === 1.0 ? '#2a2d38' : '#23262f';
-            ctx.lineWidth   = frac === 1.0 ? 1.5 : 1;
-            ctx.stroke();
-        });
-    
-        // Axis lines
-        for (let i = 0; i < n; i++) {
-            const p = ptFull(i, 1.0);
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.lineTo(p.x, p.y);
-            ctx.strokeStyle = '#23262f';
-            ctx.lineWidth   = 1;
-            ctx.stroke();
-        }
-    
-        // Data polygon fill
+</div>
+ 
+<script>
+(function () {
+    const STATS = [
+        { key: 'body', label: 'Body', color: '#E8593C', level: {{ stats['body']['level'] }} },
+        { key: 'mind', label: 'Mind', color: '#7C4DFF', level: {{ stats['mind']['level'] }} },
+        { key: 'soul', label: 'Soul', color: '#2EA87E', level: {{ stats['soul']['level'] }} },
+    ];
+ 
+    const canvas = document.getElementById('radarChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+ 
+    const cx = 150, cy = 150, r = 110;
+    const n      = STATS.length;
+    const values = STATS.map(s => s.level);
+    const colors = STATS.map(s => s.color);
+    const labels = STATS.map(s => s.label);
+    const maxVal = Math.max(...values, 5);
+ 
+    function pt(i, val) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        const frac  = val / maxVal;
+        return { x: cx + Math.cos(angle) * r * frac,
+                 y: cy + Math.sin(angle) * r * frac };
+    }
+    function ptFull(i, frac) {
+        const angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+        return { x: cx + Math.cos(angle) * r * frac,
+                 y: cy + Math.sin(angle) * r * frac };
+    }
+ 
+    // Background grid rings
+    [0.2, 0.4, 0.6, 0.8, 1.0].forEach(frac => {
         ctx.beginPath();
-        values.forEach((v, i) => {
-            const p = pt(i, v);
+        for (let i = 0; i < n; i++) {
+            const p = ptFull(i, frac);
             i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
-        });
+        }
         ctx.closePath();
-        ctx.fillStyle   = 'rgba(0,229,255,0.08)';
-        ctx.strokeStyle = 'rgba(0,229,255,0.5)';
-        ctx.lineWidth   = 1.5;
-        ctx.fill();
+        ctx.strokeStyle = frac === 1.0 ? '#2a2d38' : '#23262f';
+        ctx.lineWidth   = frac === 1.0 ? 1.5 : 1;
         ctx.stroke();
-    
-        // Data points + color dots
-        values.forEach((v, i) => {
-            const p = pt(i, v);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = colors[i];
-            ctx.fill();
-        });
-    
-        // Labels
-        ctx.font         = '11px Inter, Segoe UI, sans-serif';
-        ctx.textAlign    = 'center';
-        ctx.textBaseline = 'middle';
-        labels.forEach((label, i) => {
-            const p    = ptFull(i, 1.28);
-            ctx.fillStyle = colors[i];
-            ctx.fillText(label, p.x, p.y);
-        });
-    })();
-    </script>
-    
+    });
+ 
+    // Axis lines
+    for (let i = 0; i < n; i++) {
+        const p = ptFull(i, 1.0);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = '#23262f';
+        ctx.lineWidth   = 1;
+        ctx.stroke();
+    }
+ 
+    // Data polygon
+    ctx.beginPath();
+    values.forEach((v, i) => {
+        const p = pt(i, v);
+        i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+    ctx.fillStyle   = 'rgba(124,77,255,0.1)';
+    ctx.strokeStyle = 'rgba(124,77,255,0.5)';
+    ctx.lineWidth   = 1.5;
+    ctx.fill();
+    ctx.stroke();
+ 
+    // Data points — each in its own stat colour
+    values.forEach((v, i) => {
+        const p = pt(i, v);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+    });
+ 
+    // Labels
+    ctx.font         = '12px Inter, Segoe UI, sans-serif';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    labels.forEach((label, i) => {
+        const p = ptFull(i, 1.32);
+        ctx.fillStyle = colors[i];
+        ctx.fillText(label, p.x, p.y);
+    });
+})();
+</script>

@@ -15,46 +15,44 @@ from app.features.character_init import init_streaks, init_character_data
 bp = Blueprint('main', __name__)
 
 DEFAULT_STATS = {
-    'strength':   {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
-    'intellect':  {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
-    'discipline': {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
-    'energy':     {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
-    'influence':  {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
+    'body': {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
+    'mind': {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
+    'soul': {'level': 1, 'xp': 0, 'xp_to_next': 100, 'progress': 0},
 }
 
 SKILL_TREE_ITEMS = [
-    {"id": "advanced_workout",   "name": "Advanced Workout Program",    "cost": 500,  "category": "strength"},
-    {"id": "premium_learning",   "name": "Premium Learning Platform",   "cost": 500,  "category": "intellect"},
-    {"id": "coding_course",      "name": "Advanced Programming Course", "cost": 500,  "category": "intellect"},
-    {"id": "project_equipment",  "name": "New Dev Equipment/Tools",     "cost": 500,  "category": "influence"},
-    {"id": "cheat_day",          "name": "Guilt-Free Rest Day",         "cost": 500,  "category": "energy"},
-    {"id": "weekend_trip",       "name": "Weekend Experience/Trip",     "cost": 1000, "category": "energy"},
-    {"id": "mentor_session_rew", "name": "Mentor/Coach Session",        "cost": 1000, "category": "influence"},
-    {"id": "dream_purchase",     "name": "Major Dream Purchase",        "cost": 2500, "category": "influence"},
-    {"id": "certification",      "name": "Professional Certification",  "cost": 2500, "category": "intellect"},
+    {"id": "advanced_workout",   "name": "Advanced Workout Program",    "cost": 500,  "category": "body"},
+    {"id": "premium_learning",   "name": "Premium Learning Platform",   "cost": 500,  "category": "mind"},
+    {"id": "coding_course",      "name": "Advanced Programming Course", "cost": 500,  "category": "mind"},
+    {"id": "project_equipment",  "name": "New Dev Equipment/Tools",     "cost": 500,  "category": "soul"},
+    {"id": "cheat_day",          "name": "Guilt-Free Rest Day",         "cost": 500,  "category": "body"},
+    {"id": "weekend_trip",       "name": "Weekend Experience/Trip",     "cost": 1000, "category": "body"},
+    {"id": "mentor_session_rew", "name": "Mentor/Coach Session",        "cost": 1000, "category": "soul"},
+    {"id": "dream_purchase",     "name": "Major Dream Purchase",        "cost": 2500, "category": "soul"},
+    {"id": "certification",      "name": "Professional Certification",  "cost": 2500, "category": "mind"},
 ]
 
 DAILY_CHALLENGES = [
-    {"id": "no_caffeine",        "name": "No Caffeine Today",          "description": "No coffee, tea, or energy drinks",   "points": 15, "category": "discipline"},
-    {"id": "read_1h",            "name": "Read for 1 Hour Straight",   "description": "No breaks, full focus reading",       "points": 20, "category": "intellect"},
-    {"id": "ice_bath",           "name": "10-Minute Cold Shower",      "description": "Cold exposure challenge",             "points": 30, "category": "strength"},
-    {"id": "teach_someone",      "name": "Teach Someone Something",    "description": "Share knowledge with another person", "points": 25, "category": "influence"},
-    {"id": "no_social_media",    "name": "Zero Social Media",          "description": "Not even a peek",                    "points": 20, "category": "discipline"},
-    {"id": "wake_5am",           "name": "Wake Up at 5 AM",            "description": "Early bird special",                 "points": 15, "category": "discipline"},
-    {"id": "100_burpees",        "name": "100 Burpees",                "description": "All at once or throughout day",       "points": 25, "category": "strength"},
-    {"id": "no_screens_evening", "name": "No Screens After 8 PM",      "description": "Evening digital detox",              "points": 15, "category": "energy"},
-    {"id": "help_stranger",      "name": "Help a Stranger",            "description": "Random act of kindness",             "points": 20, "category": "influence"},
-    {"id": "30min_meditation",   "name": "30-Minute Meditation",       "description": "Extended mindfulness session",        "points": 25, "category": "energy"},
-    {"id": "no_sugar",           "name": "No Sugar Today",             "description": "Zero added sugars",                  "points": 15, "category": "discipline"},
-    {"id": "learn_new_concept",  "name": "Learn Something New",        "description": "Outside your comfort zone",          "points": 20, "category": "intellect"},
-    {"id": "write_1000_words",   "name": "Write 1000 Words",           "description": "Journal, blog, or creative writing", "points": 20, "category": "intellect"},
-    {"id": "no_complaints",      "name": "Don't Complain All Day",     "description": "Catch yourself, stay positive",      "points": 15, "category": "discipline"},
-    {"id": "silent_workout",     "name": "No Music During Workout",    "description": "Pure focus, no audio",               "points": 10, "category": "discipline"},
+    {"id": "no_caffeine",        "name": "No Caffeine Today",          "description": "No coffee, tea, or energy drinks",   "points": 15, "category": "body"},
+    {"id": "read_1h",            "name": "Read for 1 Hour Straight",   "description": "No breaks, full focus reading",       "points": 20, "category": "mind"},
+    {"id": "ice_bath",           "name": "10-Minute Cold Shower",      "description": "Cold exposure challenge",             "points": 30, "category": "body"},
+    {"id": "teach_someone",      "name": "Teach Someone Something",    "description": "Share knowledge with another person", "points": 25, "category": "soul"},
+    {"id": "no_social_media",    "name": "Zero Social Media",          "description": "Not even a peek",                    "points": 20, "category": "mind"},
+    {"id": "wake_5am",           "name": "Wake Up at 5 AM",            "description": "Early bird special",                 "points": 15, "category": "mind"},
+    {"id": "100_burpees",        "name": "100 Burpees",                "description": "All at once or throughout day",       "points": 25, "category": "body"},
+    {"id": "no_screens_evening", "name": "No Screens After 8 PM",      "description": "Evening digital detox",              "points": 15, "category": "body"},
+    {"id": "help_stranger",      "name": "Help a Stranger",            "description": "Random act of kindness",             "points": 20, "category": "soul"},
+    {"id": "30min_meditation",   "name": "30-Minute Meditation",       "description": "Extended mindfulness session",        "points": 25, "category": "body"},
+    {"id": "no_sugar",           "name": "No Sugar Today",             "description": "Zero added sugars",                  "points": 15, "category": "body"},
+    {"id": "learn_new_concept",  "name": "Learn Something New",        "description": "Outside your comfort zone",          "points": 20, "category": "mind"},
+    {"id": "write_1000_words",   "name": "Write 1000 Words",           "description": "Journal, blog, or creative writing", "points": 20, "category": "mind"},
+    {"id": "no_complaints",      "name": "Don't Complain All Day",     "description": "Catch yourself, stay positive",      "points": 15, "category": "mind"},
+    {"id": "silent_workout",     "name": "No Music During Workout",    "description": "Pure focus, no audio",               "points": 10, "category": "mind"},
 ]
 
 ACHIEVEMENTS_LIST = [
     {"id": "week_warrior",  "name": "Week Warrior",      "description": "7 days of 100+ points",               "points_bonus": 50},
-    {"id": "balanced_life", "name": "Balanced Life",     "description": "Hit all 5 stat categories in a week", "points_bonus": 50},
+    {"id": "balanced_life", "name": "Balanced Life",     "description": "Hit all 3 stat categories in a week", "points_bonus": 50},
     {"id": "comeback_kid",  "name": "Comeback Kid",      "description": "200+ points after a <50p day",        "points_bonus": 30},
     {"id": "flow_state",    "name": "Flow State Master", "description": "4+ hours deep work in one day",       "points_bonus": 80},
     {"id": "digital_monk",  "name": "Digital Monk",      "description": "Zero screens entire day",             "points_bonus": 100},
@@ -97,7 +95,7 @@ def get_or_create_character():
 
 def build_stats_with_progress(character):
     stats = {}
-    for stat_name in ['strength', 'intellect', 'discipline', 'energy', 'influence']:
+    for stat_name in ['body', 'mind', 'soul']:
         d = character.stats.get(stat_name, DEFAULT_STATS[stat_name])
         xp, xp_to_next, level = d.get('xp', 0), d.get('xp_to_next', 100), d.get('level', 1)
         progress = max(0, min(int((xp / xp_to_next) * 100) if xp_to_next else 0, 100))
@@ -444,7 +442,7 @@ def complete_challenge():
         character.daily_challenge = deepcopy(challenge_data)
         character.total_points += points
         character.current_week_points += points
-        character.stats = update_stats(character.stats or {}, {challenge.get('category', 'discipline'): points})
+        character.stats = update_stats(character.stats or {}, {challenge.get('category', 'mind'): points})
         save_character(character)
         flash(f'🎯 Challenge complete! +{points}p', 'success')
     except Exception:
@@ -499,14 +497,14 @@ def add_note():
             plans.append({'id': len(plans) + 1, 'content': content, 'date': today, 'completed': False})
             character.plans = plans
             character.total_points += 5
-            character.stats = update_stats(character.stats or {}, {'discipline': 5})
+            character.stats = update_stats(character.stats or {}, {'mind': 5})
             flash('📋 Plan added! +5p', 'success')
         else:
             notes = list(character.notes or [])
             notes.append({'id': len(notes) + 1, 'content': content, 'date': today})
             character.notes = notes[-50:]
             character.total_points += 2
-            character.stats = update_stats(character.stats or {}, {'energy': 2})
+            character.stats = update_stats(character.stats or {}, {'mind': 2})
             flash('📝 Note saved! +2p', 'success')
         save_character(character)
     except Exception:
@@ -527,7 +525,7 @@ def complete_plan(plan_id):
             plan['completed_date'] = datetime.now().strftime('%Y-%m-%d')
             character.plans = plans
             character.total_points += 3
-            character.stats = update_stats(character.stats or {}, {'discipline': 3})
+            character.stats = update_stats(character.stats or {}, {'mind': 3})
             save_character(character)
             flash('✅ Plan completed! +3p', 'success')
     except Exception:
@@ -560,7 +558,7 @@ def add_transaction():
         budget['balance'] = budget.get('balance', 0) + (amount if t_type == 'income' else -amount)
         character.budget = budget
         character.total_points += 2
-        character.stats = update_stats(character.stats or {}, {'discipline': 2})
+        character.stats = update_stats(character.stats or {}, {'mind': 2})
         save_character(character)
         flash('💰 Transaction added! +2p', 'success')
     except Exception:
@@ -613,7 +611,7 @@ def log_prog_session():
         prog['session_history'] = history[-50:]
         character.prog_skills   = prog
         character.total_points += points_earned
-        character.stats = update_stats(character.stats or {}, {'intellect': points_earned})
+        character.stats = update_stats(character.stats or {}, {'mind': points_earned})
         save_character(character)
         flash(f'💻 Session logged! +{points_earned}p' + (' 🆙 LEVEL UP!' if leveled_up else ''), 'success')
     except Exception:
@@ -696,7 +694,7 @@ def log_personal_record():
 
         if is_pr and points:
             character.total_points += points
-            character.stats = update_stats(character.stats or {}, {'strength': points})
+            character.stats = update_stats(character.stats or {}, {'body': points})
 
         records['exercises'] = exercises
         character.personal_records = records
@@ -812,7 +810,7 @@ def log_workout_session():
         # Points: base 25 + up to 15 bonus for exercises
         points = 25 + min(len(completed_exercises) * 2, 15)
         character.total_points  += points
-        character.stats = update_stats(character.stats or {}, {'strength': points})
+        character.stats = update_stats(character.stats or {}, {'body': points})
 
         ws['history'] = history[-50:]
         character.workout_sessions = ws
