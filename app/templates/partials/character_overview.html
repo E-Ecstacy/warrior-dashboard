@@ -1,46 +1,326 @@
 <section class="character-overview">
-    <div class="main-stats">
-        <div class="info-item">
-            <span class="label">LEVEL</span>
-            <span class="value">{{ character.level }}</span>
+ 
+    <!-- ── Hero row: warrior + stats side by side ── -->
+    <div style="display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap; margin-bottom:1.25rem;">
+ 
+        <!-- Warrior canvas -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; flex-shrink:0;">
+            <canvas id="warriorCanvas" width="160" height="240"
+                    style="border-radius:10px; background:#0a0a14;"></canvas>
+            <div id="warriorRank" style="font-size:0.68rem; letter-spacing:.1em; text-transform:uppercase; color:#3a4050;">Recruit</div>
         </div>
-        <div class="info-item">
-            <span class="label">TOTAL POINTS</span>
-            <span class="value">{{ character.total_points }}</span>
-        </div>
-        <div class="info-item">
-            <span class="label">THIS WEEK</span>
-            <span class="value">{{ character.current_week_points }} <span style="font-size:0.9rem;color:#3a4050;">/ 600</span></span>
-        </div>
-        <!-- Weekly progress bar fills remaining space -->
-        <div style="flex:1; max-width:320px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;">
-                <span style="font-size:0.62rem;color:#3a4050;letter-spacing:2px;text-transform:uppercase;font-weight:600;">WEEKLY PROGRESS</span>
-                <span style="font-size:0.62rem;color:#3a4050;">{{ [(character.current_week_points / 600 * 100)|int, 100]|min }}%</span>
+ 
+        <!-- Right column: main numbers + stat cards -->
+        <div style="flex:1; min-width:220px; display:flex; flex-direction:column; gap:1rem;">
+ 
+            <!-- Main stats row -->
+            <div class="main-stats">
+                <div class="info-item">
+                    <span class="label">LEVEL</span>
+                    <span class="value">{{ character.level }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">TOTAL POINTS</span>
+                    <span class="value">{{ character.total_points }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">THIS WEEK</span>
+                    <span class="value">{{ character.current_week_points }} <span style="font-size:0.9rem;color:#3a4050;">/ 600</span></span>
+                </div>
+                <div style="flex:1; max-width:260px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;">
+                        <span style="font-size:0.62rem;color:#3a4050;letter-spacing:2px;text-transform:uppercase;font-weight:600;">WEEKLY PROGRESS</span>
+                        <span style="font-size:0.62rem;color:#3a4050;">{{ [(character.current_week_points / 600 * 100)|int, 100]|min }}%</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:4px;overflow:hidden;">
+                        <div style="height:100%;width:{{ [(character.current_week_points / 600 * 100)|int, 100]|min }}%;background:linear-gradient(90deg,#00e5ff,#7c4dff);border-radius:3px;transition:width 0.6s ease;"></div>
+                    </div>
+                </div>
             </div>
-            <div style="background:rgba(255,255,255,0.05);border-radius:3px;height:4px;overflow:hidden;">
-                <div style="height:100%;width:{{ [(character.current_week_points / 600 * 100)|int, 100]|min }}%;background:linear-gradient(90deg,#00e5ff,#7c4dff);border-radius:3px;transition:width 0.6s ease;"></div>
+ 
+            <!-- Stat cards -->
+            <div class="grid-3">
+                {% for stat_name, stat_color in [('body','#E8593C'),('mind','#7C4DFF'),('soul','#d4a017')] %}
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <h3>{{ stat_name.upper() }}</h3>
+                    </div>
+                    <div class="stat-level">Lv. {{ stats[stat_name]['level'] }}</div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" style="width:{{ stats[stat_name]['progress'] }}%;background:{{ stat_color }};"></div>
+                    </div>
+                    <div class="stat-xp">{{ stats[stat_name]['xp'] }} / {{ stats[stat_name]['xp_to_next'] }} XP</div>
+                </div>
+                {% endfor %}
             </div>
+ 
         </div>
     </div>
  
-    <div class="grid-3">
-        {% for stat_name, stat_icon, stat_color in [
-            ('body', '🔥', '#E8593C'),
-            ('mind', '⚡', '#7C4DFF'),
-            ('soul', '👑', '#2EA87E')
-        ] %}
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-icon">{{ stat_icon }}</span>
-                <h3>{{ stat_name.upper() }}</h3>
-            </div>
-            <div class="stat-level">Lv. {{ stats[stat_name]['level'] }}</div>
-            <div class="stat-bar">
-                <div class="stat-bar-fill" style="width:{{ stats[stat_name]['progress'] }}%;background:{{ stat_color }};"></div>
-            </div>
-            <div class="stat-xp">{{ stats[stat_name]['xp'] }} / {{ stats[stat_name]['xp_to_next'] }} XP</div>
-        </div>
-        {% endfor %}
-    </div>
 </section>
+ 
+<script>
+(function () {
+    const BODY = {{ stats['body']['level'] }};
+    const MIND = {{ stats['mind']['level'] }};
+    const SOUL = {{ stats['soul']['level'] }};
+ 
+    const canvas = document.getElementById('warriorCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = 160, H = 240;
+ 
+    function lerp(a, b, t) { return a + (b - a) * Math.min(1, Math.max(0, t)); }
+    function lerpCol(h1, h2, t) {
+        const p = s => parseInt(s, 16);
+        const r1=p(h1.slice(1,3)),g1=p(h1.slice(3,5)),b1=p(h1.slice(5,7));
+        const r2=p(h2.slice(1,3)),g2=p(h2.slice(3,5)),b2=p(h2.slice(5,7));
+        return `rgb(${Math.round(lerp(r1,r2,t))},${Math.round(lerp(g1,g2,t))},${Math.round(lerp(b1,b2,t))})`;
+    }
+ 
+    const bt = (BODY - 1) / 19;
+    const mt = (MIND - 1) / 19;
+    const st = (SOUL - 1) / 19;
+    const cx = W / 2, floor = H - 30;
+ 
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+ 
+        // bg
+        ctx.fillStyle = '#0a0a14';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#0f0f1e';
+        ctx.fillRect(0, floor + 14, W, H);
+        ctx.strokeStyle = '#1a1a30'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, floor+14); ctx.lineTo(W, floor+14); ctx.stroke();
+ 
+        // shadow
+        ctx.beginPath(); ctx.ellipse(cx, floor+18, lerp(13,22,bt), 4, 0, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
+ 
+        // soul rings
+        if (st > 0.1) {
+            const rings = Math.ceil(st * 3);
+            for (let r = 0; r < rings; r++) {
+                ctx.beginPath(); ctx.arc(cx, floor - 64, 40 + r*18 + st*8, 0, Math.PI*2);
+                ctx.strokeStyle = `rgba(212,160,23,${(0.07 - r*0.015)*st})`; ctx.lineWidth = 6;
+                ctx.stroke();
+            }
+        }
+ 
+        // mind aura
+        if (mt > 0.4) {
+            const gr = ctx.createRadialGradient(cx, floor-80, 0, cx, floor-80, 50+mt*22);
+            gr.addColorStop(0, `rgba(124,77,255,${(mt-0.4)*0.22})`);
+            gr.addColorStop(1, 'rgba(124,77,255,0)');
+            ctx.beginPath(); ctx.arc(cx, floor-80, 50+mt*22, 0, Math.PI*2);
+            ctx.fillStyle = gr; ctx.fill();
+        }
+ 
+        // soul wings
+        if (st > 0.78) {
+            const wal = (st - 0.78) / 0.22;
+            ctx.fillStyle = `rgba(212,160,23,${wal*0.15})`;
+            ctx.beginPath();
+            ctx.moveTo(cx-6, floor-96); ctx.bezierCurveTo(cx-60,floor-130,cx-68,floor-72,cx-36,floor-50);
+            ctx.lineTo(cx-8, floor-76); ctx.closePath(); ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(cx+6, floor-96); ctx.bezierCurveTo(cx+60,floor-130,cx+68,floor-72,cx+36,floor-50);
+            ctx.lineTo(cx+8, floor-76); ctx.closePath(); ctx.fill();
+        }
+ 
+        // legs
+        const legW = lerp(7, 13, bt);
+        const legH = lerp(42, 52, bt*0.3);
+        ctx.fillStyle = mt > 0.1 ? lerpCol('#2a2a3e','#4a5570',mt) : '#1e1e2e';
+        ctx.beginPath(); ctx.roundRect(cx-legW*1.9, floor-legH, legW*1.6, legH, [3,3,2,2]); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(cx+legW*0.3, floor-legH, legW*1.6, legH, [3,3,2,2]); ctx.fill();
+        // knee
+        if (mt > 0.2) {
+            ctx.fillStyle = lerpCol('#4a4a6a','#7080a0',mt);
+            ctx.beginPath(); ctx.arc(cx-legW, floor-legH*0.42, legW*0.65, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx+legW, floor-legH*0.42, legW*0.65, 0, Math.PI*2); ctx.fill();
+        }
+        // boots
+        ctx.fillStyle = lerpCol('#1a1008','#2e1f10',bt);
+        ctx.beginPath(); ctx.roundRect(cx-legW*2.1, floor-12, legW*1.8, 12, [2,2,3,3]); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(cx+legW*0.3, floor-12, legW*1.8, 12, [2,2,3,3]); ctx.fill();
+ 
+        // torso
+        const sw   = lerp(18, 42, bt);
+        const ww   = lerp(12, 26, bt);
+        const torH = lerp(42, 52, bt*0.3);
+        const torY = floor - legH - torH + 3;
+ 
+        ctx.fillStyle = mt > 0.2 ? lerpCol('#2a2a3e','#3e4560',mt) : '#1e1e2e';
+        ctx.beginPath();
+        ctx.moveTo(cx-sw,torY); ctx.lineTo(cx+sw,torY);
+        ctx.lineTo(cx+ww,torY+torH); ctx.lineTo(cx-ww,torY+torH);
+        ctx.closePath(); ctx.fill();
+        // chest plate
+        ctx.fillStyle = mt > 0.1 ? lerpCol('#3a3a5a','#6070a0',mt) : '#2e2e48';
+        ctx.beginPath();
+        ctx.moveTo(cx-sw*0.7,torY+3); ctx.lineTo(cx+sw*0.7,torY+3);
+        ctx.lineTo(cx+ww*0.7,torY+torH*0.6); ctx.lineTo(cx-ww*0.7,torY+torH*0.6);
+        ctx.closePath(); ctx.fill();
+        // centre ridge
+        ctx.strokeStyle = lerpCol('#444466','#8090c0',mt); ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(cx,torY+6); ctx.lineTo(cx,torY+torH*0.55); ctx.stroke();
+        // body glow
+        if (bt > 0.6) {
+            ctx.fillStyle = `rgba(232,89,60,${(bt-0.6)*0.35})`;
+            ctx.beginPath(); ctx.ellipse(cx, torY+torH*0.5, sw*0.45, torH*0.3, 0, 0, Math.PI*2); ctx.fill();
+        }
+        // runes
+        if (mt > 0.36) {
+            const ral = (mt-0.36)/0.64;
+            ctx.strokeStyle = `rgba(124,77,255,${ral*0.9})`; ctx.lineWidth = 1;
+            const ry = torY + torH*0.28;
+            ctx.beginPath(); ctx.moveTo(cx-9,ry-4); ctx.lineTo(cx-6,ry+4); ctx.lineTo(cx-12,ry+4); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx+9,ry-4); ctx.lineTo(cx+6,ry+4); ctx.lineTo(cx+12,ry+4); ctx.stroke();
+            ctx.beginPath(); ctx.rect(cx-3,ry-3,6,6); ctx.stroke();
+        }
+ 
+        // pauldrons
+        const pSize = lerp(8,16,bt*0.5+mt*0.5);
+        ctx.fillStyle = lerpCol('#2e2e48','#5060a0',mt);
+        ctx.beginPath(); ctx.ellipse(cx-sw-pSize*0.2,torY+5,pSize,pSize*0.55,-0.3,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(cx+sw+pSize*0.2,torY+5,pSize,pSize*0.55, 0.3,0,Math.PI*2); ctx.fill();
+ 
+        // arms
+        const armW = lerp(6, 14, bt);
+        const armL = lerp(34, 46, bt*0.3);
+        ctx.fillStyle = mt > 0.1 ? lerpCol('#2a2a3e','#4a5570',mt) : '#1e1e2e';
+        ctx.beginPath(); ctx.roundRect(cx-sw-armW*1.1,torY+pSize*0.4,armW*2,armL,armW*0.5); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(cx+sw-armW*0.9,torY+pSize*0.4,armW*2,armL,armW*0.5); ctx.fill();
+        if (bt > 0.5) {
+            const fal = (bt-0.5)*0.5;
+            ctx.fillStyle = `rgba(232,89,60,${fal})`;
+            ctx.beginPath(); ctx.arc(cx-sw-armW*0.1,torY+pSize*0.4+armL+armW,armW*0.9,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx+sw+armW*0.1,torY+pSize*0.4+armL+armW,armW*0.9,0,Math.PI*2); ctx.fill();
+        }
+ 
+        // sword
+        const wx = cx+sw+armW*1.4, wy = torY+pSize*0.4;
+        if (BODY >= 12) {
+            ctx.strokeStyle = lerpCol('#a0a8c0','#dde4ff',bt); ctx.lineWidth = 4; ctx.lineCap='round';
+            ctx.beginPath(); ctx.moveTo(wx+3,wy-14); ctx.lineTo(wx+3,wy+armL+36); ctx.stroke();
+            ctx.strokeStyle = lerpCol('#8a7020','#d4a820',st); ctx.lineWidth = 9;
+            ctx.beginPath(); ctx.moveTo(wx-6,wy+16); ctx.lineTo(wx+12,wy+16); ctx.stroke();
+            if (bt > 0.78) {
+                ctx.strokeStyle = `rgba(232,89,60,${(bt-0.78)*2})`; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(wx+3,wy-14); ctx.lineTo(wx+3,wy+armL+36); ctx.stroke();
+            }
+        } else if (BODY >= 6) {
+            ctx.strokeStyle = lerpCol('#808898','#c0c8e0',bt); ctx.lineWidth = 2.5; ctx.lineCap='round';
+            ctx.beginPath(); ctx.moveTo(wx+2,wy-8); ctx.lineTo(wx+2,wy+armL+24); ctx.stroke();
+            ctx.strokeStyle = '#7a6010'; ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.moveTo(wx-5,wy+14); ctx.lineTo(wx+9,wy+14); ctx.stroke();
+        } else {
+            ctx.strokeStyle = '#707880'; ctx.lineWidth = 2; ctx.lineCap='round';
+            ctx.beginPath(); ctx.moveTo(wx,wy+6); ctx.lineTo(wx,wy+armL+16); ctx.stroke();
+            ctx.strokeStyle = '#5a4a08'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(wx-4,wy+14); ctx.lineTo(wx+4,wy+14); ctx.stroke();
+        }
+ 
+        // shield
+        if (MIND >= 4) {
+            const sx = cx-sw-armW*2.6, sy = torY+pSize*0.4+8;
+            const ss = lerp(0.6,1.1,mt);
+            ctx.save(); ctx.translate(sx,sy); ctx.scale(ss,ss);
+            ctx.fillStyle = lerpCol('#2a2a40','#3a4570',mt);
+            ctx.beginPath();
+            ctx.moveTo(0,-16); ctx.lineTo(15,-16); ctx.lineTo(18,7); ctx.lineTo(7,19); ctx.lineTo(-3,7); ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = lerpCol('#3a3a60','#6070b0',mt);
+            ctx.beginPath();
+            ctx.moveTo(2,-11); ctx.lineTo(12,-11); ctx.lineTo(14,5); ctx.lineTo(7,14); ctx.lineTo(0,5); ctx.closePath();
+            ctx.fill();
+            if (mt > 0.5) {
+                ctx.fillStyle = `rgba(124,77,255,${(mt-0.5)*0.8})`;
+                ctx.beginPath(); ctx.arc(7,0,4,0,Math.PI*2); ctx.fill();
+            }
+            ctx.restore();
+        }
+ 
+        // neck
+        const neckY = torY - 9;
+        ctx.fillStyle = lerpCol('#2a2a3e','#3e4560',mt);
+        ctx.beginPath(); ctx.roundRect(cx-6,neckY,12,12,2); ctx.fill();
+ 
+        // head
+        const headR = lerp(15,19,bt*0.15);
+        const headY = neckY - headR - 1;
+        ctx.fillStyle = lerpCol('#252530','#404870',mt);
+        ctx.beginPath(); ctx.arc(cx,headY,headR,Math.PI,0); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(cx-headR,headY-1,headR*2,headR+6,[0,0,3,3]); ctx.fill();
+        // visor
+        ctx.fillStyle = '#0d0d18';
+        ctx.beginPath(); ctx.roundRect(cx-headR*0.65,headY+2,headR*1.3,headR*0.42,2); ctx.fill();
+        // eyes
+        const eyeCol = mt > 0.5
+            ? `rgba(180,140,255,${0.6+mt*0.4})`
+            : `rgba(232,89,60,${0.5+bt*0.4})`;
+        ctx.fillStyle = eyeCol;
+        ctx.beginPath(); ctx.arc(cx-headR*0.3,headY+headR*0.24,lerp(1.5,3,mt*0.5),0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+headR*0.3,headY+headR*0.24,lerp(1.5,3,mt*0.5),0,Math.PI*2); ctx.fill();
+        // crest
+        if (mt > 0.55) {
+            ctx.fillStyle = lerpCol('#5060a0','#8090d0',mt);
+            ctx.beginPath();
+            ctx.moveTo(cx-3,headY-headR); ctx.lineTo(cx,headY-headR-lerp(0,13,(mt-0.55)/0.45));
+            ctx.lineTo(cx+3,headY-headR); ctx.closePath(); ctx.fill();
+        }
+ 
+        // crown
+        if (st > 0.1) {
+            const crownH = lerp(5,20,st);
+            const crownW = lerp(12,22,st);
+            const crownY = headY - headR - crownH + 1;
+            const pts    = Math.min(3 + Math.floor(st*4), 7);
+            const gemCol = st > 0.6 ? '#ffe066' : st > 0.35 ? '#c8c8c8' : '#cd7f32';
+            ctx.beginPath();
+            ctx.moveTo(cx-crownW, crownY+crownH);
+            for (let i=0; i<=pts; i++) {
+                ctx.lineTo(cx-crownW+(crownW*2/pts)*i, i%2===0 ? crownY : crownY+crownH*0.55);
+            }
+            ctx.lineTo(cx+crownW, crownY+crownH); ctx.closePath();
+            ctx.fillStyle = lerpCol('#7a4800','#d4a017',st); ctx.fill();
+            ctx.strokeStyle = lerpCol('#a06010','#ffd040',st); ctx.lineWidth = 1; ctx.stroke();
+            if (st > 0.25) {
+                for (let i=0; i<=pts; i+=2) {
+                    ctx.beginPath(); ctx.arc(cx-crownW+(crownW*2/pts)*i, crownY+2, lerp(1,2.5,st), 0,Math.PI*2);
+                    ctx.fillStyle = gemCol; ctx.fill();
+                }
+            }
+            if (st > 0.78) {
+                ctx.strokeStyle = `rgba(255,220,80,${((st-0.78)/0.22)*0.5})`; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cx, crownY+crownH*0.5, crownW+6, 0,Math.PI*2); ctx.stroke();
+            }
+        }
+ 
+        // mind rune orbit at max
+        if (mt > 0.94) {
+            const time = Date.now() / 1200;
+            for (let i=0; i<4; i++) {
+                const a = time + i*(Math.PI/2);
+                ctx.beginPath(); ctx.arc(cx+Math.cos(a)*32, headY+Math.sin(a)*14, 2.5, 0,Math.PI*2);
+                ctx.fillStyle = 'rgba(160,120,255,0.9)'; ctx.fill();
+            }
+        }
+    }
+ 
+    // rank label
+    const avg = Math.round((BODY+MIND+SOUL)/3);
+    const ranks = [[18,'Ascended Champion'],[15,'Elite Knight'],[12,'Seasoned Warrior'],[9,'Rising Fighter'],[6,'Apprentice'],[3,'Initiate'],[0,'Recruit']];
+    const rank = ranks.find(([t]) => avg >= t)[1];
+    document.getElementById('warriorRank').textContent = rank;
+ 
+    // animate only if mind is near max (orbiting runes), otherwise draw once
+    if (MIND >= 19) {
+        (function loop(){ draw(); requestAnimationFrame(loop); })();
+    } else {
+        draw();
+    }
+})();
+</script>
