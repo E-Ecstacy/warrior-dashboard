@@ -1,0 +1,395 @@
+{% if log_result %}
+ 
+{% set has_levelup = log_result.level_ups | length > 0 %}
+ 
+{# Build old/new stat levels for the cutscene JS #}
+{% set new_levels = {
+    'body': stats['body']['level'],
+    'mind': stats['mind']['level'],
+    'soul': stats['soul']['level']
+} %}
+{% set old_levels = {
+    'body': stats['body']['level'],
+    'mind': stats['mind']['level'],
+    'soul': stats['soul']['level']
+} %}
+{% for stat, old_lv, new_lv in log_result.level_ups %}
+    {% set _ = old_levels.update({stat: old_lv}) %}
+{% endfor %}
+ 
+<!-- ── Quest Result Card ──────────────────────────────────────────── -->
+<div id="questResult" style="
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.82);
+    display:flex; align-items:center; justify-content:center; padding:1rem;
+" onclick="dismissResult()">
+ 
+    <div id="resultCard" style="
+        background:#0f0f1e; border:1px solid #2a2a40; border-radius:20px;
+        padding:2rem 2.5rem; width:100%; max-width:420px; text-align:center;
+        transform:scale(0.85); opacity:0;
+        transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+    " onclick="event.stopPropagation()">
+ 
+        <div id="pointsBurst" style="
+            font-size:3.5rem; font-weight:700;
+            font-family:'DM Sans',sans-serif; color:#ffd700;
+            margin-bottom:0.25rem;
+            opacity:0; transform:translateY(20px);
+            transition:opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+        ">+{{ log_result.points }}p</div>
+ 
+        <div style="font-size:0.75rem; letter-spacing:.12em; text-transform:uppercase;
+                    color:#3a4050; margin-bottom:1.5rem;">Quest complete</div>
+ 
+        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem;">
+            {% for stat, color, icon in [('body','#E8593C','🔥'),('mind','#7C4DFF','⚡'),('soul','#d4a017','👑')] %}
+            {% if log_result.stat_xp.get(stat, 0) > 0 %}
+            <div style="text-align:left;">
+                <div style="display:flex; justify-content:space-between;
+                            font-size:0.75rem; color:#3a4050; margin-bottom:0.3rem;">
+                    <span style="color:{{ color }};">{{ icon }} {{ stat.upper() }}</span>
+                    <span style="color:{{ color }};">+{{ log_result.stat_xp[stat] }} XP</span>
+                </div>
+                <div style="background:rgba(255,255,255,0.05); border-radius:3px; height:5px; overflow:hidden;">
+                    <div class="xp-fill-bar"
+                         data-width="{{ log_result.stat_progress.get(stat, 0) }}"
+                         style="height:100%; width:0%; background:{{ color }};
+                                border-radius:3px; transition:width 1s ease 0.6s;"></div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+ 
+        {% if log_result.combos %}
+        <div style="
+            background:rgba(255,214,0,0.08); border:1px solid rgba(255,214,0,0.2);
+            border-radius:10px; padding:0.75rem 1rem; margin-bottom:1.25rem;
+        ">
+            <div style="font-size:0.7rem; letter-spacing:.1em; color:#9a8000;
+                        text-transform:uppercase; margin-bottom:0.3rem;">⚡ Combo</div>
+            {% for combo in log_result.combos %}
+            <div style="font-size:0.85rem; color:#ffd700; font-weight:600;">{{ combo }}</div>
+            {% endfor %}
+            <div style="font-size:0.75rem; color:#9a8000; margin-top:0.3rem;">
+                +{{ log_result.combo_bonus }}p bonus
+            </div>
+        </div>
+        {% endif %}
+ 
+        {% if has_levelup %}
+        <div id="levelUpTeaser" style="
+            background:linear-gradient(135deg,rgba(124,77,255,0.12),rgba(212,160,23,0.08));
+            border:1px solid rgba(124,77,255,0.25);
+            border-radius:10px; padding:0.75rem 1rem; margin-bottom:1.25rem;
+            opacity:0; transition:opacity 0.4s ease 1.1s;
+        ">
+            {% for stat, old_lv, new_lv in log_result.level_ups %}
+            <div style="font-size:1rem; font-weight:700; color:#a090ff;
+                        font-family:'DM Sans',sans-serif;">
+                🆙 {{ stat.upper() }} Lv {{ old_lv }} → Lv {{ new_lv }}
+            </div>
+            {% endfor %}
+            <div style="font-size:0.72rem; color:#5a5070; margin-top:0.4rem;">
+                Your warrior has evolved — witness the change
+            </div>
+        </div>
+        {% endif %}
+ 
+        {% if log_result.penalised %}
+        <div style="
+            background:rgba(255,50,50,0.08); border:1px solid rgba(255,50,50,0.25);
+            border-radius:10px; padding:0.75rem 1rem; margin-bottom:1.25rem;
+            font-size:0.85rem; color:#ff6060;
+        ">😈 Nemesis Mode: non-negotiable broken. Points zeroed.</div>
+        {% endif %}
+ 
+        <button onclick="dismissResult()" style="
+            background:none; border:1px solid #2a2a40; color:#3a4050;
+            border-radius:8px; padding:0.6rem 2rem; cursor:pointer;
+            font-size:0.85rem; font-family:'DM Sans',sans-serif;
+            transition:border-color .15s, color .15s; width:100%;
+        " onmouseover="this.style.borderColor='#4a4a60';this.style.color='#aaa';"
+           onmouseout="this.style.borderColor='#2a2a40';this.style.color='#3a4050';">
+            {% if has_levelup %}Watch your warrior evolve →{% else %}Continue →{% endif %}
+        </button>
+    </div>
+</div>
+ 
+ 
+{% if has_levelup %}
+<!-- ── Level-Up Cutscene ──────────────────────────────────────────── -->
+<div id="cutscene" style="
+    position:fixed; inset:0; z-index:3000; background:#000;
+    display:none; flex-direction:column;
+    align-items:center; justify-content:center; gap:1.5rem;
+">
+    <div id="cutsceneFlash" style="
+        position:absolute; inset:0; background:#fff;
+        opacity:0; pointer-events:none; transition:opacity 0.15s ease;
+    "></div>
+ 
+    <canvas id="particleCanvas" style="position:absolute; inset:0; pointer-events:none;"></canvas>
+ 
+    <canvas id="cutsceneWarrior" width="220" height="330" style="
+        border-radius:16px; position:relative; z-index:1;
+        box-shadow:0 0 0px rgba(124,77,255,0);
+        transition:box-shadow 0.3s ease;
+    "></canvas>
+ 
+    <div id="cutsceneText" style="
+        position:relative; z-index:1; text-align:center;
+        opacity:0; transform:translateY(16px);
+        transition:opacity 0.5s ease, transform 0.5s ease;
+    ">
+        <div style="font-size:0.7rem; letter-spacing:.2em; text-transform:uppercase;
+                    color:#5a5070; margin-bottom:0.5rem;">Warrior evolved</div>
+        {% for stat, old_lv, new_lv in log_result.level_ups %}
+        <div style="font-size:1.8rem; font-weight:700; color:#fff;
+                    font-family:'DM Sans',sans-serif; line-height:1.2;">
+            {{ stat.upper() }}
+            <span style="color:#7c4dff;"> Lv {{ old_lv }} → </span>
+            <span style="color:{% if stat == 'body' %}#E8593C{% elif stat == 'mind' %}#a090ff{% else %}#d4a017{% endif %};">
+                Lv {{ new_lv }}
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+ 
+    <button id="cutsceneCloseBtn" onclick="closeCutscene()" style="
+        position:relative; z-index:1;
+        background:none; border:1px solid #2a2a40; color:#3a4050;
+        border-radius:8px; padding:0.5rem 1.5rem; cursor:pointer;
+        font-size:0.8rem; font-family:'DM Sans',sans-serif;
+        opacity:0; transition:opacity 0.4s ease, border-color .15s, color .15s;
+    " onmouseover="this.style.borderColor='#4a4a60';this.style.color='#aaa';"
+       onmouseout="this.style.borderColor='#2a2a40';this.style.color='#3a4050';">
+        Continue
+    </button>
+</div>
+{% endif %}
+ 
+ 
+<script>
+    /* ── Global functions — defined before anything else ── */
+    var _autoDismiss;
+ 
+    function dismissResult() {
+        clearTimeout(_autoDismiss);
+        var overlay = document.getElementById('questResult');
+        if (!overlay) return;
+        overlay.style.opacity    = '0';
+        overlay.style.transition = 'opacity 0.3s ease';
+        setTimeout(function () {
+            overlay.remove();
+            {% if has_levelup %}if (typeof startCutscene === 'function') startCutscene();{% endif %}
+        }, 300);
+    }
+ 
+    function closeCutscene() {
+        var el = document.getElementById('cutscene');
+        if (!el) return;
+        el.style.opacity    = '0';
+        el.style.transition = 'opacity 0.4s ease';
+        setTimeout(function () { el.remove(); }, 400);
+    }
+ 
+(function () {
+ 
+    /* ── Result card entrance ── */
+    var card = document.getElementById('resultCard');
+    requestAnimationFrame(function () {
+        card.style.transform = 'scale(1)';
+        card.style.opacity   = '1';
+    });
+    setTimeout(function () {
+        var b = document.getElementById('pointsBurst');
+        if (b) { b.style.opacity='1'; b.style.transform='translateY(0)'; }
+    }, 200);
+    setTimeout(function () {
+        document.querySelectorAll('.xp-fill-bar').forEach(function (bar) {
+            bar.style.width = bar.dataset.width + '%';
+        });
+        var t = document.getElementById('levelUpTeaser');
+        if (t) t.style.opacity = '1';
+    }, 100);
+ 
+    _autoDismiss = setTimeout(dismissResult, 8000);
+ 
+    {% if has_levelup %}
+ 
+    /* ── Stat levels ── */
+    var OLD = { body:{{ old_levels['body'] }}, mind:{{ old_levels['mind'] }}, soul:{{ old_levels['soul'] }} };
+    var NEW = { body:{{ new_levels['body'] }}, mind:{{ new_levels['mind'] }}, soul:{{ new_levels['soul'] }} };
+ 
+    /* ── Helpers ── */
+    function lerp(a,b,t){ return a+(b-a)*Math.min(1,Math.max(0,t)); }
+    function lerpCol(h1,h2,t){
+        function p(s){return parseInt(s,16);}
+        var r1=p(h1.slice(1,3)),g1=p(h1.slice(3,5)),b1=p(h1.slice(5,7));
+        var r2=p(h2.slice(1,3)),g2=p(h2.slice(3,5)),b2=p(h2.slice(5,7));
+        return 'rgb('+Math.round(lerp(r1,r2,t))+','+Math.round(lerp(g1,g2,t))+','+Math.round(lerp(b1,b2,t))+')';
+    }
+ 
+    /* ── Particles ── */
+    var pts=[], pCanvas, pCtx;
+    function initParticles(){
+        pCanvas=document.getElementById('particleCanvas');
+        pCanvas.width=window.innerWidth; pCanvas.height=window.innerHeight;
+        pCtx=pCanvas.getContext('2d');
+    }
+    function spawnParticles(x,y,color,count){
+        for(var i=0;i<count;i++){
+            var a=Math.random()*Math.PI*2, sp=1.5+Math.random()*5;
+            pts.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,
+                      life:1,decay:0.015+Math.random()*0.02,r:2+Math.random()*4,color:color});
+        }
+    }
+    function tickParticles(){
+        pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+        pts=pts.filter(function(p){return p.life>0;});
+        pts.forEach(function(p){
+            pCtx.beginPath(); pCtx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
+            pCtx.fillStyle=p.color+Math.round(p.life*255).toString(16).padStart(2,'0');
+            pCtx.fill();
+            p.x+=p.vx; p.y+=p.vy; p.vy+=0.08; p.life-=p.decay;
+        });
+    }
+ 
+    /* ── Draw warrior ── */
+    function draw(canvas, body, mind, soul){
+        var ctx=canvas.getContext('2d');
+        var W=canvas.width, H=canvas.height;
+        var bt=(body-1)/19, mt=(mind-1)/19, st=(soul-1)/19;
+        var cx=W/2, fl=H-40;
+ 
+        ctx.clearRect(0,0,W,H);
+        ctx.fillStyle='#0a0a14'; ctx.fillRect(0,0,W,H);
+        ctx.fillStyle='#0f0f1e'; ctx.fillRect(0,fl+14,W,H);
+        ctx.beginPath(); ctx.ellipse(cx,fl+18,lerp(13,22,bt),4,0,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fill();
+ 
+        if(st>0.1){for(var r=0;r<Math.ceil(st*3);r++){ctx.beginPath();ctx.arc(cx,fl-64,40+r*18+st*8,0,Math.PI*2);ctx.strokeStyle='rgba(212,160,23,'+(0.07-r*0.015)*st+')';ctx.lineWidth=6;ctx.stroke();}}
+        if(mt>0.4){var gr=ctx.createRadialGradient(cx,fl-80,0,cx,fl-80,50+mt*22);gr.addColorStop(0,'rgba(124,77,255,'+(mt-0.4)*0.22+')');gr.addColorStop(1,'rgba(124,77,255,0)');ctx.beginPath();ctx.arc(cx,fl-80,50+mt*22,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();}
+        if(st>0.78){var wal=(st-0.78)/0.22;ctx.fillStyle='rgba(212,160,23,'+(wal*0.15)+')';ctx.beginPath();ctx.moveTo(cx-6,fl-96);ctx.bezierCurveTo(cx-60,fl-130,cx-68,fl-72,cx-36,fl-50);ctx.lineTo(cx-8,fl-76);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(cx+6,fl-96);ctx.bezierCurveTo(cx+60,fl-130,cx+68,fl-72,cx+36,fl-50);ctx.lineTo(cx+8,fl-76);ctx.closePath();ctx.fill();}
+ 
+        var lW=lerp(7,13,bt),lH=lerp(42,52,bt*0.3),lCol=mt>0.1?lerpCol('#2a2a3e','#4a5570',mt):'#1e1e2e';
+        ctx.fillStyle=lCol;
+        ctx.beginPath();ctx.roundRect(cx-lW*1.9,fl-lH,lW*1.6,lH,[3,3,2,2]);ctx.fill();
+        ctx.beginPath();ctx.roundRect(cx+lW*0.3,fl-lH,lW*1.6,lH,[3,3,2,2]);ctx.fill();
+        if(mt>0.2){ctx.fillStyle=lerpCol('#4a4a6a','#7080a0',mt);ctx.beginPath();ctx.arc(cx-lW,fl-lH*0.42,lW*0.65,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(cx+lW,fl-lH*0.42,lW*0.65,0,Math.PI*2);ctx.fill();}
+        ctx.fillStyle=lerpCol('#1a1008','#2e1f10',bt);
+        ctx.beginPath();ctx.roundRect(cx-lW*2.1,fl-12,lW*1.8,12,[2,2,3,3]);ctx.fill();
+        ctx.beginPath();ctx.roundRect(cx+lW*0.3,fl-12,lW*1.8,12,[2,2,3,3]);ctx.fill();
+ 
+        var sw=lerp(18,42,bt),ww=lerp(12,26,bt),tH=lerp(42,52,bt*0.3),tY=fl-lH-tH+3;
+        ctx.fillStyle=mt>0.2?lerpCol('#2a2a3e','#3e4560',mt):'#1e1e2e';
+        ctx.beginPath();ctx.moveTo(cx-sw,tY);ctx.lineTo(cx+sw,tY);ctx.lineTo(cx+ww,tY+tH);ctx.lineTo(cx-ww,tY+tH);ctx.closePath();ctx.fill();
+        ctx.fillStyle=mt>0.1?lerpCol('#3a3a5a','#6070a0',mt):'#2e2e48';
+        ctx.beginPath();ctx.moveTo(cx-sw*0.7,tY+3);ctx.lineTo(cx+sw*0.7,tY+3);ctx.lineTo(cx+ww*0.7,tY+tH*0.6);ctx.lineTo(cx-ww*0.7,tY+tH*0.6);ctx.closePath();ctx.fill();
+        ctx.strokeStyle=lerpCol('#444466','#8090c0',mt);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx,tY+6);ctx.lineTo(cx,tY+tH*0.55);ctx.stroke();
+        if(bt>0.6){ctx.fillStyle='rgba(232,89,60,'+(bt-0.6)*0.35+')';ctx.beginPath();ctx.ellipse(cx,tY+tH*0.5,sw*0.45,tH*0.3,0,0,Math.PI*2);ctx.fill();}
+        if(mt>0.36){var ral=(mt-0.36)/0.64;ctx.strokeStyle='rgba(124,77,255,'+ral*0.9+')';ctx.lineWidth=1;var ry=tY+tH*0.28;ctx.beginPath();ctx.moveTo(cx-9,ry-4);ctx.lineTo(cx-6,ry+4);ctx.lineTo(cx-12,ry+4);ctx.stroke();ctx.beginPath();ctx.moveTo(cx+9,ry-4);ctx.lineTo(cx+6,ry+4);ctx.lineTo(cx+12,ry+4);ctx.stroke();ctx.beginPath();ctx.rect(cx-3,ry-3,6,6);ctx.stroke();}
+ 
+        var pS=lerp(8,16,bt*0.5+mt*0.5);
+        ctx.fillStyle=lerpCol('#2e2e48','#5060a0',mt);
+        ctx.beginPath();ctx.ellipse(cx-sw-pS*0.2,tY+5,pS,pS*0.55,-0.3,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.ellipse(cx+sw+pS*0.2,tY+5,pS,pS*0.55,0.3,0,Math.PI*2);ctx.fill();
+ 
+        var aW=lerp(6,14,bt),aL=lerp(34,46,bt*0.3);
+        ctx.fillStyle=mt>0.1?lerpCol('#2a2a3e','#4a5570',mt):'#1e1e2e';
+        ctx.beginPath();ctx.roundRect(cx-sw-aW*1.1,tY+pS*0.4,aW*2,aL,aW*0.5);ctx.fill();
+        ctx.beginPath();ctx.roundRect(cx+sw-aW*0.9,tY+pS*0.4,aW*2,aL,aW*0.5);ctx.fill();
+        if(bt>0.5){ctx.fillStyle='rgba(232,89,60,'+(bt-0.5)*0.5+')';ctx.beginPath();ctx.arc(cx-sw-aW*0.1,tY+pS*0.4+aL+aW,aW*0.9,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(cx+sw+aW*0.1,tY+pS*0.4+aL+aW,aW*0.9,0,Math.PI*2);ctx.fill();}
+ 
+        var wx=cx+sw+aW*1.4,wy=tY+pS*0.4;
+        if(body>=12){ctx.strokeStyle=lerpCol('#a0a8c0','#dde4ff',bt);ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(wx+3,wy-14);ctx.lineTo(wx+3,wy+aL+36);ctx.stroke();ctx.strokeStyle=lerpCol('#8a7020','#d4a820',st);ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(wx-6,wy+16);ctx.lineTo(wx+12,wy+16);ctx.stroke();}
+        else if(body>=6){ctx.strokeStyle=lerpCol('#808898','#c0c8e0',bt);ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(wx+2,wy-8);ctx.lineTo(wx+2,wy+aL+24);ctx.stroke();ctx.strokeStyle='#7a6010';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(wx-5,wy+14);ctx.lineTo(wx+9,wy+14);ctx.stroke();}
+        else{ctx.strokeStyle='#707880';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(wx,wy+6);ctx.lineTo(wx,wy+aL+16);ctx.stroke();ctx.strokeStyle='#5a4a08';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(wx-4,wy+14);ctx.lineTo(wx+4,wy+14);ctx.stroke();}
+ 
+        if(mind>=4){var sx=cx-sw-aW*2.6,sy=tY+pS*0.4+8,ss=lerp(0.6,1.1,mt);ctx.save();ctx.translate(sx,sy);ctx.scale(ss,ss);ctx.fillStyle=lerpCol('#2a2a40','#3a4570',mt);ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(15,-16);ctx.lineTo(18,7);ctx.lineTo(7,19);ctx.lineTo(-3,7);ctx.closePath();ctx.fill();ctx.fillStyle=lerpCol('#3a3a60','#6070b0',mt);ctx.beginPath();ctx.moveTo(2,-11);ctx.lineTo(12,-11);ctx.lineTo(14,5);ctx.lineTo(7,14);ctx.lineTo(0,5);ctx.closePath();ctx.fill();if(mt>0.5){ctx.fillStyle='rgba(124,77,255,'+(mt-0.5)*0.8+')';ctx.beginPath();ctx.arc(7,0,4,0,Math.PI*2);ctx.fill();}ctx.restore();}
+ 
+        var nY=tY-9;
+        ctx.fillStyle=lerpCol('#2a2a3e','#3e4560',mt);ctx.beginPath();ctx.roundRect(cx-6,nY,12,12,2);ctx.fill();
+ 
+        var hR=lerp(15,19,bt*0.15),hY=nY-hR-1;
+        ctx.fillStyle=lerpCol('#252530','#404870',mt);ctx.beginPath();ctx.arc(cx,hY,hR,Math.PI,0);ctx.fill();ctx.beginPath();ctx.roundRect(cx-hR,hY-1,hR*2,hR+6,[0,0,3,3]);ctx.fill();
+        ctx.fillStyle='#0d0d18';ctx.beginPath();ctx.roundRect(cx-hR*0.65,hY+2,hR*1.3,hR*0.42,2);ctx.fill();
+        ctx.fillStyle=mt>0.5?'rgba(180,140,255,'+(0.6+mt*0.4)+')':'rgba(232,89,60,'+(0.5+bt*0.4)+')';
+        ctx.beginPath();ctx.arc(cx-hR*0.3,hY+hR*0.24,lerp(1.5,3,mt*0.5),0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.arc(cx+hR*0.3,hY+hR*0.24,lerp(1.5,3,mt*0.5),0,Math.PI*2);ctx.fill();
+        if(mt>0.55){ctx.fillStyle=lerpCol('#5060a0','#8090d0',mt);ctx.beginPath();ctx.moveTo(cx-3,hY-hR);ctx.lineTo(cx,hY-hR-lerp(0,13,(mt-0.55)/0.45));ctx.lineTo(cx+3,hY-hR);ctx.closePath();ctx.fill();}
+ 
+        if(st>0.1){var cH=lerp(5,20,st),cW=lerp(12,22,st),cY=hY-hR-cH+1,cPts=Math.min(3+Math.floor(st*4),7);
+            var gC=st>0.6?'#ffe066':st>0.35?'#c8c8c8':'#cd7f32';
+            ctx.beginPath();ctx.moveTo(cx-cW,cY+cH);for(var i=0;i<=cPts;i++){ctx.lineTo(cx-cW+(cW*2/cPts)*i,i%2===0?cY:cY+cH*0.55);}ctx.lineTo(cx+cW,cY+cH);ctx.closePath();
+            ctx.fillStyle=lerpCol('#7a4800','#d4a017',st);ctx.fill();ctx.strokeStyle=lerpCol('#a06010','#ffd040',st);ctx.lineWidth=1;ctx.stroke();
+            if(st>0.25){for(var j=0;j<=cPts;j+=2){ctx.beginPath();ctx.arc(cx-cW+(cW*2/cPts)*j,cY+2,lerp(1,2.5,st),0,Math.PI*2);ctx.fillStyle=gC;ctx.fill();}}
+        }
+    }
+ 
+    /* ── Cutscene ── */
+    var cCanvas, animStart;
+ 
+    window.startCutscene = function(){
+        var el=document.getElementById('cutscene');
+        el.style.display='flex';
+        cCanvas=document.getElementById('cutsceneWarrior');
+        initParticles();
+        draw(cCanvas, OLD.body, OLD.mind, OLD.soul);
+        setTimeout(triggerFlash, 1400);
+    };
+ 
+    function triggerFlash(){
+        var flash=document.getElementById('cutsceneFlash');
+        flash.style.opacity='1';
+        setTimeout(function(){
+            flash.style.opacity='0';
+            animStart=null;
+            requestAnimationFrame(evolveLoop);
+        }, 160);
+    }
+ 
+    function evolveLoop(ts){
+        if(!animStart) animStart=ts;
+        var t=Math.min((ts-animStart)/1800, 1);
+        var e=1-Math.pow(1-t,3); // ease out cubic
+ 
+        draw(cCanvas, lerp(OLD.body,NEW.body,e), lerp(OLD.mind,NEW.mind,e), lerp(OLD.soul,NEW.soul,e));
+        tickParticles();
+ 
+        if(t<0.9 && Math.random()<0.25){
+            var rect=cCanvas.getBoundingClientRect();
+            var cx=rect.left+rect.width/2, cy=rect.top+rect.height*0.4;
+            {% for stat, old_lv, new_lv in log_result.level_ups %}
+            spawnParticles(cx, cy, '{% if stat == "body" %}#E8593C{% elif stat == "mind" %}#7C4DFF{% else %}#d4a017{% endif %}', 3);
+            {% endfor %}
+        }
+ 
+        cCanvas.style.boxShadow='0 0 '+Math.round(e*50)+'px rgba(124,77,255,'+e*0.7+')';
+ 
+        if(t<1){ requestAnimationFrame(evolveLoop); } else { onEvolveComplete(); }
+    }
+ 
+    function onEvolveComplete(){
+        var rect=cCanvas.getBoundingClientRect();
+        var cx=rect.left+rect.width/2, cy=rect.top+rect.height*0.4;
+        {% for stat, old_lv, new_lv in log_result.level_ups %}
+        spawnParticles(cx,cy,'{% if stat == "body" %}#E8593C{% elif stat == "mind" %}#7C4DFF{% else %}#d4a017{% endif %}',50);
+        {% endfor %}
+        spawnParticles(cx,cy,'#ffd700',30);
+        requestAnimationFrame(function trail(){tickParticles();if(pts.length>0)requestAnimationFrame(trail);});
+ 
+        var text=document.getElementById('cutsceneText');
+        var btn=document.getElementById('cutsceneCloseBtn');
+        text.style.opacity='1'; text.style.transform='translateY(0)';
+        setTimeout(function(){btn.style.opacity='1';},400);
+        setTimeout(closeCutscene, 6000);
+    }
+ 
+    {% endif %}
+ 
+})();
+</script>
+{% endif %}

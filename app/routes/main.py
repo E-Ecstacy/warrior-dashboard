@@ -14,7 +14,7 @@ import traceback
 from copy import deepcopy
 from datetime import datetime, timedelta
  
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from flask_login import login_required, current_user
 from sqlalchemy.orm.attributes import flag_modified
  
@@ -653,7 +653,6 @@ class ActivityLogService(BaseService):
     parse form → calculate points → update streaks → check combos →
     apply nemesis penalty → update stats → return result for the route to persist.
     """
- 
     def log(self, form, log_date_str: str) -> dict:
         tier2             = {a: (a in form) for a in TIER2_ACTIVITIES}
         tier3             = {a: (a in form) for a in TIER3_ACTIVITIES}
@@ -680,22 +679,45 @@ class ActivityLogService(BaseService):
         if penalised:
             points = 0
  
+        # Snapshot levels BEFORE update so we can detect level-ups
+        old_levels = {
+            s: (self.character.stats or {}).get(s, {}).get('level', 1)
+            for s in ('body', 'mind', 'soul')
+        }
+ 
         self.character.stats = update_stats(self.character.stats or {}, stat_xp)
         self._add_points(points)
+ 
+        # Detect which stats levelled up
+        level_ups = []
+        for stat in ('body', 'mind', 'soul'):
+            new_level = (self.character.stats or {}).get(stat, {}).get('level', 1)
+            if new_level > old_levels[stat]:
+                level_ups.append((stat, old_levels[stat], new_level))
+ 
+        # Current XP progress % for each stat (for the bar animation)
+        stat_progress = {}
+        for stat in ('body', 'mind', 'soul'):
+            d          = (self.character.stats or {}).get(stat, {})
+            xp         = d.get('xp', 0)
+            xp_to_next = d.get('xp_to_next', 100)
+            stat_progress[stat] = int((xp / xp_to_next) * 100) if xp_to_next else 0
  
         return {
             'points':            points,
             'combo_bonus':       combo_bonus,
-            'combos':            combos,
+            'combos':            [c['name'] for c in combos],
             'tier1_complete':    tier1_complete,
             'tier2':             tier2,
             'tier3':             tier3,
             'streaks_completed': streaks_completed,
             'penalised':         penalised,
+            'stat_xp':           {s: xp for s, xp in stat_xp.items() if xp > 0},
+            'stat_progress':     stat_progress,
+            'level_ups':         level_ups,
         }
- 
- 
-# ══════════════════════════════════════════════════════════════════════════════
+
+# ═════════════════════════════════════════════════════════════════════════════
 # Dashboard builder — assembles all template context for the index view
 # ══════════════════════════════════════════════════════════════════════════════
  
@@ -871,7 +893,9 @@ def index():
         return redirect(url_for('main.onboarding'))
  
     context = DashboardBuilder(character, current_user.id).build()
-    return render_template('index.html', **context)
+    log_result = session.pop('log_result', None)
+    return render_template('index.html', log_result=log_result, **context)
+
  
  
 @bp.route('/log-activity', methods=['POST'])
@@ -904,7 +928,7 @@ def log_activity():
                 user_id=current_user.id, date=log_date,
                 total_points=result['points'], tier1_complete=result['tier1_complete'],
                 tier2=result['tier2'], tier3=result['tier3'],
-                combos=[c['name'] for c in result['combos']],
+                combos=result['combos'],
                 combo_bonus=result['combo_bonus'],
                 notes=request.form.get('notes', ''),
             ))
@@ -913,11 +937,16 @@ def log_activity():
         AchievementService(character).check_all(recent_logs)
         CharacterRepository.save(character)
  
-        flash(f"✅ Quest logged! +{result['points']} points", 'success')
-        if result['combos']:
-            combo_names = ', '.join(c['name'] for c in result['combos'])
-            flash(f"⚡ Combos: {combo_names}! +{result['combo_bonus']} bonus", 'success')
- 
+        session['log_result'] = {
+            'points':        result['points'],
+            'combo_bonus':   result['combo_bonus'],
+            'combos':        result['combos'],
+            'stat_xp':       result['stat_xp'],
+            'stat_progress': result['stat_progress'],
+            'level_ups':     result['level_ups'],
+            'penalised':     result['penalised'],
+        }
+
     except Exception:
         traceback.print_exc()
         flash('Error logging activity', 'error')
